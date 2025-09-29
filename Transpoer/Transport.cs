@@ -7,6 +7,7 @@ using System.IO.Ports;
 using ScottPlot;
 using System.Threading;
 using System.IO;
+using System.Diagnostics;
 
 namespace Measurement_Kits
 {
@@ -198,9 +199,104 @@ namespace Measurement_Kits
                 var x = ex.Message;                
             }
 
-        }       
+        }
+        private async Task MeasurementLoop(CancellationToken token, bool read_time = false)
+        {
+            string filePath = label_path.Text;
 
-        private async Task MeasurementLoop(CancellationToken token,bool read_time = false)
+            // якщо файл новий – додаємо заголовки
+            if (!File.Exists(filePath))
+            {
+                if (read_time)
+                {
+                    File.AppendAllText(filePath, "Resistance\tTemperature\n");
+                }
+                else
+                {
+                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
+                }
+            }
+            //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
+            File.AppendAllText(filePath, "Resistance\tTemperature\n");
+
+            var sw = new Stopwatch();
+            sw.Start();
+            long lastTick = sw.ElapsedTicks;
+
+            while (!token.IsCancellationRequested)
+            {
+                // Обчислюємо час, який пройшов
+                long currentTick = sw.ElapsedMilliseconds;
+                double elapsedMicroSec = (long)(currentTick - lastTick);
+
+                if (elapsedMicroSec >= _timeStepMs) // наприклад, 50 мкс
+                {
+                    lastTick += _timeStepMs;
+                    var time = DateTime.Now.ToString("HH:mm:ss.fff");
+
+                    //  зчитування даних з приладів
+                    double resistance = _keithley.MeasureResistance(measureCounter);
+                    double temperature = _lakeshore.MeasureTemperature(measureCounter);
+                    AddTemperature(temperature);
+                    // Запис у файл
+                    //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
+                    string line;
+                    if (read_time)
+                    {
+                        line = $"{resistance:E8}\t{temperature:E8}\n";
+                    }
+                    else
+                    {
+                        line = $"{time}\t{resistance:E8}\t{temperature:E8}\n";
+                    }
+
+                    File.AppendAllText(filePath, line);                    
+                    measureCounter++;                    
+                    if (measureCounter % 3 == 0) // кожні 3 цикли
+                    {
+                        double TempSpeed = 0;
+                        if (tempHistory.Count >= 2)
+                        {
+                            var first = tempHistory.Peek();
+                            var last = tempHistory.Last();
+                            double deltaT = last.Temp - first.Temp;
+                            double deltaTime = (last.Time - first.Time).TotalSeconds;
+                            TempSpeed = (deltaT / deltaTime) * 60.0; // K/min
+                        }
+                        // Оновлюємо label у GUI-потоці
+                        this.Invoke(new Action(() =>
+                        {
+                            label_Temp.Text = $"Temp Speed = {TempSpeed:f2} K/min";
+                        }));
+
+                    }
+                    // Оновлення графіка на формі
+                    this.Invoke(new Action(() =>
+                    {                        
+                        DataLoggerPlot1.Add(temperature, resistance);
+                        DataLoggerPlot2.Add(measureCounter, temperature);
+                        Plot1.Refresh();
+                        Plot2.Refresh();                       
+                    }));
+                }
+                else
+                {
+                    int delay = (int)(_timeStepMs - elapsedMicroSec);
+                    if (delay > 1)
+                    {
+                        await Task.Delay(delay);
+                    }
+                    else
+                    {
+                        await Task.Yield();
+                    }
+                }
+                // Коротка пауза, щоб не “з’їдати” CPU
+                await Task.Yield();
+            }
+
+        }
+        private async Task MeasurementLoop_LastVersion(CancellationToken token,bool read_time = false)
         {
             string filePath = label_path.Text;
 

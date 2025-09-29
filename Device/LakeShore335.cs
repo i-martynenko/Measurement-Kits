@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
+using System.Reflection;
+
 namespace Measurement_Kits
 {
     class LakeShore335 : InstrumentBase
@@ -11,15 +14,24 @@ namespace Measurement_Kits
         string[] res;
         public LakeShore335() 
         {
-            string path = @"A:\MyPrograms\Measurement Kits\1.txt";
             var list = new List<string>();
             List<string> ress = new List<string>();
-            using (var sr = new StreamReader(path))
+            string resourceName = "Measurement_Kits.1.txt";
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
             {
-                string line;
-                while ((line = sr.ReadLine()) != null)
+                if (stream == null)
                 {
-                    list.Add(line);
+                    MessageBox.Show($"Не вдалося знайти ресурс {resourceName}");
+                    return;
+                }
+
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        list.Add(line);
+                    }
                 }
             }
             for (int i = 0; i < list.Count; i++)
