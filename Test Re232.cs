@@ -1,0 +1,217 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+using System.IO.Ports;
+using System.Threading;
+using System.Diagnostics;
+namespace Measurement_Kits
+{
+    public partial class Form_Test_RS232 : Form
+    {
+        private Form_Menu Form_Menu;
+        private Keithley2000 _keithley;
+        private LakeShore335 _lakeshore;
+        private int measureCounter;
+        private CancellationTokenSource _cts;
+        private int _timeStepMs;
+        private bool _isRunning = false;
+        public Form_Test_RS232(Form_Menu menu)
+        {
+            InitializeComponent();
+            Form_Menu = menu;
+            GlobalExitHelper.AttachGlobalExit(this);
+            CreatCOM();
+            measureCounter = 0;
+            _timeStepMs = (int)numericUpDown1.Value;
+            _keithley = new Keithley2000();
+            _lakeshore = new LakeShore335();
+        }       
+
+        private void button_SendCommand_Click(object sender, EventArgs e)
+        {
+            int count = (checkedListBox1.GetItemChecked(0) ? 1 : 0) + (checkedListBox1.GetItemChecked(1) ? 1 : 0) + (checkedListBox1.GetItemChecked(2) ? 1 : 0);
+
+            if (count != 1)
+            {
+                MessageBox.Show("Треба обрати тільке одне обладнення!");
+                return;
+            }
+            string command = textBox_Respond.Text;
+            if (checkedListBox1.GetItemChecked(0))
+            {                
+                var time = DateTime.Now.ToString("HH:mm:ss.fff");
+                string respond = _keithley.SendCommand(command);
+                richTextBox_Out.Text += $"{time}\t{respond}\n";
+            }
+            if (checkedListBox1.GetItemChecked(1))
+            {
+                MessageBox.Show("Multimetr");
+                var time = DateTime.Now.ToString("HH:mm:ss.fff");
+                string respond = _lakeshore.SendCommand(command);
+                richTextBox_Out.Text += $"{time}\t{respond}\n";
+            }
+            if (checkedListBox1.GetItemChecked(2))
+            {
+                MessageBox.Show("Multimetr");
+                var time = DateTime.Now.ToString("HH:mm:ss.fff");
+                string respond = _keithley.SendCommand(command);
+                richTextBox_Out.Text += $"{time}\t{respond}\n";
+            }
+        }
+        
+        private async Task MeasurementLoop(CancellationToken token, string command, InstrumentBase Device)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            long lastTick = sw.ElapsedTicks;
+
+            while (!token.IsCancellationRequested)
+            {
+                // Обчислюємо час, який пройшов
+                long currentTick = sw.ElapsedMilliseconds;
+                double elapsedMicroSec = (long)(currentTick - lastTick);
+
+                if (elapsedMicroSec >= _timeStepMs) // наприклад, 50 мкс
+                {
+                    lastTick += _timeStepMs;
+                    var time = DateTime.Now.ToString("HH:mm:ss.fff");
+                    string respond = Device.SendCommand(command);
+                    this.Invoke(new Action(() =>
+                    {
+                        richTextBox_Out.Text += $"{measureCounter}\t{time}\t{respond}\n";
+                    }));
+                    measureCounter++;
+                }
+                else
+                {
+                    int delay = (int)(_timeStepMs - elapsedMicroSec);
+                    if (delay>1)
+                    {
+                        await Task.Delay(delay);
+                    }
+                    else
+                    {
+                        await Task.Yield();
+                    }
+                }
+                
+                // Коротка пауза, щоб не “з’їдати” CPU
+                await Task.Yield();
+            }
+                         
+        }
+        
+        private async void button_LoopSendCommand_Click(object sender, EventArgs e)
+        {
+            int count = (checkedListBox1.GetItemChecked(0) ? 1 : 0) + (checkedListBox1.GetItemChecked(1) ? 1 : 0) + (checkedListBox1.GetItemChecked(2) ? 1 : 0);
+
+            if (count != 1)
+            {
+                MessageBox.Show("Треба обрати тільке одне обладнення!");
+                return;                
+            }
+            string command = textBox_Respond.Text;
+            try
+            {
+                if (!_isRunning)
+                {
+                    // Запуск
+                    _cts = new CancellationTokenSource();
+                    _isRunning = true;
+                    button_LoopSendCommand.BackColor = Color.Green;
+
+                    if (checkedListBox1.GetItemChecked(0))
+                    {
+                        await Task.Run(() => MeasurementLoop(_cts.Token, command,_keithley));
+                    }
+                    if (checkedListBox1.GetItemChecked(1))
+                    {
+                        await Task.Run(() => MeasurementLoop(_cts.Token, command,_lakeshore));
+                    }
+                    if (checkedListBox1.GetItemChecked(2))
+                    {
+                        await Task.Run(() => MeasurementLoop(_cts.Token, command, null));
+                    }                    
+                }
+                else
+                {
+                    // Пауза
+                    _cts.Cancel();
+                    _isRunning = false;
+                    button_LoopSendCommand.BackColor = Color.Gray;
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // Це нормальне завершення, нічого не робимо
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Помилка в циклі: {ex.Message}");
+                var x = ex.Message;
+            }
+        }
+        private void button_Menu_Click(object sender, EventArgs e)
+        {
+            GlobalExitHelper.SwitchTo(this, Form_Menu);
+        }
+
+        private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
+        {            
+            bool status = _keithley.Connect(comboBox1.Text);
+            if (status)
+            {
+                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
+            }
+        }
+
+        private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
+        {            
+            bool status = _lakeshore.Connect(comboBox2.Text);
+            if (status)
+            {
+                button_ConnectToLakeShore.BackColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                button_ConnectToLakeShore.BackColor = System.Drawing.Color.Orange;
+            }
+        }
+        private void CreatCOM()
+        {
+            comboBox1.Items.Clear();
+            string[] ports = SerialPort.GetPortNames(); // Отримати список портів
+
+            comboBox1.Items.AddRange(ports);
+            comboBox2.Items.AddRange(ports);
+            if (ports.Length > 0)
+            {
+                comboBox1.SelectedIndex = 0; // вибрати перший порт
+                comboBox2.SelectedIndex = 1;
+            }
+            else
+                comboBox1.Text = "Немає портів";
+        }
+        
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            _timeStepMs = (int)numericUpDown1.Value;
+        }
+
+        private void button_Clr_Click(object sender, EventArgs e)
+        {
+            richTextBox_Out.Text = "";
+        }
+    }
+}
