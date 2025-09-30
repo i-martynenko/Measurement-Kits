@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Device\Lock_in_Amplifier_SR830.cs" />
     <Compile Include="Menu\Form_Menu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -150,7 +151,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Command.txt" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="1.txt" />
   </ItemGroup>

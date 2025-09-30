@@ -45,27 +45,36 @@ namespace Measurement_Kits
             this.button_LoopSendCommand = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.button_Clr = new System.Windows.Forms.Button();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.button_ConnectToSR830 = new System.Windows.Forms.Button();
+            this.numericUpDown_waitms = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_waitms)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox_Respond
             // 
-            this.textBox_Respond.Location = new System.Drawing.Point(56, 67);
+            this.textBox_Respond.Location = new System.Drawing.Point(439, 81);
             this.textBox_Respond.Name = "textBox_Respond";
             this.textBox_Respond.Size = new System.Drawing.Size(182, 20);
             this.textBox_Respond.TabIndex = 0;
             // 
             // richTextBox_Out
             // 
-            this.richTextBox_Out.Location = new System.Drawing.Point(40, 104);
+            this.richTextBox_Out.Dock = System.Windows.Forms.DockStyle.Left;
+            this.richTextBox_Out.Location = new System.Drawing.Point(0, 0);
             this.richTextBox_Out.Name = "richTextBox_Out";
-            this.richTextBox_Out.Size = new System.Drawing.Size(395, 334);
+            this.richTextBox_Out.Size = new System.Drawing.Size(423, 516);
             this.richTextBox_Out.TabIndex = 1;
             this.richTextBox_Out.Text = "";
             // 
             // button_SendCommand
             // 
-            this.button_SendCommand.Location = new System.Drawing.Point(244, 43);
+            this.button_SendCommand.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_SendCommand.Location = new System.Drawing.Point(471, 31);
             this.button_SendCommand.Name = "button_SendCommand";
             this.button_SendCommand.Size = new System.Drawing.Size(163, 44);
             this.button_SendCommand.TabIndex = 2;
@@ -75,9 +84,10 @@ namespace Measurement_Kits
             // 
             // button_Menu
             // 
-            this.button_Menu.Location = new System.Drawing.Point(499, 12);
+            this.button_Menu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Menu.Location = new System.Drawing.Point(585, 484);
             this.button_Menu.Name = "button_Menu";
-            this.button_Menu.Size = new System.Drawing.Size(112, 43);
+            this.button_Menu.Size = new System.Drawing.Size(57, 20);
             this.button_Menu.TabIndex = 3;
             this.button_Menu.Text = "Menu";
             this.button_Menu.UseVisualStyleBackColor = true;
@@ -85,24 +95,27 @@ namespace Measurement_Kits
             // 
             // comboBox2
             // 
+            this.comboBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(449, 133);
+            this.comboBox2.Location = new System.Drawing.Point(439, 194);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 21);
             this.comboBox2.TabIndex = 15;
             // 
             // comboBox1
             // 
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(449, 90);
+            this.comboBox1.Location = new System.Drawing.Point(439, 151);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 14;
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(447, 117);
+            this.label2.Location = new System.Drawing.Point(437, 178);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(59, 13);
             this.label2.TabIndex = 13;
@@ -110,8 +123,9 @@ namespace Measurement_Kits
             // 
             // button_ConnectToLakeShore
             // 
+            this.button_ConnectToLakeShore.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_ConnectToLakeShore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.button_ConnectToLakeShore.Location = new System.Drawing.Point(587, 131);
+            this.button_ConnectToLakeShore.Location = new System.Drawing.Point(577, 192);
             this.button_ConnectToLakeShore.Name = "button_ConnectToLakeShore";
             this.button_ConnectToLakeShore.Size = new System.Drawing.Size(24, 23);
             this.button_ConnectToLakeShore.TabIndex = 12;
@@ -120,8 +134,9 @@ namespace Measurement_Kits
             // 
             // button_ConnectToMultimetr
             // 
+            this.button_ConnectToMultimetr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_ConnectToMultimetr.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.button_ConnectToMultimetr.Location = new System.Drawing.Point(587, 88);
+            this.button_ConnectToMultimetr.Location = new System.Drawing.Point(577, 149);
             this.button_ConnectToMultimetr.Name = "button_ConnectToMultimetr";
             this.button_ConnectToMultimetr.Size = new System.Drawing.Size(24, 23);
             this.button_ConnectToMultimetr.TabIndex = 11;
@@ -130,8 +145,9 @@ namespace Measurement_Kits
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(447, 74);
+            this.label1.Location = new System.Drawing.Point(437, 135);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(49, 13);
             this.label1.TabIndex = 10;
@@ -139,12 +155,13 @@ namespace Measurement_Kits
             // 
             // checkedListBox1
             // 
+            this.checkedListBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkedListBox1.FormattingEnabled = true;
             this.checkedListBox1.Items.AddRange(new object[] {
             "Multimetr",
             "LakeShore",
             "Lock-in Amplifier"});
-            this.checkedListBox1.Location = new System.Drawing.Point(450, 172);
+            this.checkedListBox1.Location = new System.Drawing.Point(440, 275);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.Size = new System.Drawing.Size(120, 94);
             this.checkedListBox1.TabIndex = 16;
@@ -152,7 +169,8 @@ namespace Measurement_Kits
             // 
             // button_LoopSendCommand
             // 
-            this.button_LoopSendCommand.Location = new System.Drawing.Point(244, 11);
+            this.button_LoopSendCommand.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_LoopSendCommand.Location = new System.Drawing.Point(471, 0);
             this.button_LoopSendCommand.Name = "button_LoopSendCommand";
             this.button_LoopSendCommand.Size = new System.Drawing.Size(163, 26);
             this.button_LoopSendCommand.TabIndex = 17;
@@ -162,12 +180,13 @@ namespace Measurement_Kits
             // 
             // numericUpDown1
             // 
+            this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.numericUpDown1.Increment = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            this.numericUpDown1.Location = new System.Drawing.Point(450, 273);
+            this.numericUpDown1.Location = new System.Drawing.Point(440, 406);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -180,7 +199,7 @@ namespace Measurement_Kits
             // 
             // button_Clr
             // 
-            this.button_Clr.Location = new System.Drawing.Point(360, 104);
+            this.button_Clr.Location = new System.Drawing.Point(348, 0);
             this.button_Clr.Name = "button_Clr";
             this.button_Clr.Size = new System.Drawing.Size(75, 23);
             this.button_Clr.TabIndex = 19;
@@ -188,11 +207,87 @@ namespace Measurement_Kits
             this.button_Clr.UseVisualStyleBackColor = true;
             this.button_Clr.Click += new System.EventHandler(this.button_Clr_Click);
             // 
+            // comboBox3
+            // 
+            this.comboBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Location = new System.Drawing.Point(439, 238);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(121, 21);
+            this.comboBox3.TabIndex = 22;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(437, 222);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(118, 13);
+            this.label3.TabIndex = 21;
+            this.label3.Text = "Lock-in Amplifier Se830";
+            // 
+            // button_ConnectToSR830
+            // 
+            this.button_ConnectToSR830.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_ConnectToSR830.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.button_ConnectToSR830.Location = new System.Drawing.Point(577, 236);
+            this.button_ConnectToSR830.Name = "button_ConnectToSR830";
+            this.button_ConnectToSR830.Size = new System.Drawing.Size(24, 23);
+            this.button_ConnectToSR830.TabIndex = 20;
+            this.button_ConnectToSR830.UseVisualStyleBackColor = false;
+            this.button_ConnectToSR830.Click += new System.EventHandler(this.button_ConnectToSR830_Click);
+            // 
+            // numericUpDown_waitms
+            // 
+            this.numericUpDown_waitms.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.numericUpDown_waitms.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.numericUpDown_waitms.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.numericUpDown_waitms.Location = new System.Drawing.Point(442, 466);
+            this.numericUpDown_waitms.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDown_waitms.Name = "numericUpDown_waitms";
+            this.numericUpDown_waitms.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDown_waitms.TabIndex = 23;
+            this.numericUpDown_waitms.ValueChanged += new System.EventHandler(this.numericUpDown_waitms_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(439, 450);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(125, 13);
+            this.label4.TabIndex = 24;
+            this.label4.Text = "wait ms in sendcommand";
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(439, 390);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(86, 13);
+            this.label5.TabIndex = 25;
+            this.label5.Text = "TimeStep in loop";
+            // 
             // Form_Test_RS232
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(632, 450);
+            this.ClientSize = new System.Drawing.Size(654, 516);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.numericUpDown_waitms);
+            this.Controls.Add(this.comboBox3);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.button_ConnectToSR830);
             this.Controls.Add(this.button_Clr);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.button_LoopSendCommand);
@@ -209,7 +304,9 @@ namespace Measurement_Kits
             this.Controls.Add(this.textBox_Respond);
             this.Name = "Form_Test_RS232";
             this.Text = "Test_Re232";
+            this.Load += new System.EventHandler(this.Form_Test_RS232_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_waitms)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -232,5 +329,11 @@ namespace Measurement_Kits
         private System.Windows.Forms.Button button_LoopSendCommand;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button button_Clr;
+        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button_ConnectToSR830;
+        private System.Windows.Forms.NumericUpDown numericUpDown_waitms;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
     }
 }

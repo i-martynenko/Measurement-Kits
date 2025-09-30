@@ -1,0 +1,78 @@
+﻿Keithley 2000 Multimeter (2000-900-01 Rev. J / 2010)
+
+*IDN? — ідентифікатор.
+*RST — скидання.
+MEAS:VOLT:DC? — виміряти DC напругу.
+MEAS:CURR:DC? — виміряти DC струм.
+MEAS:RES? — виміряти опір.
+READ? — зчитати результат за попередньою конфігурацією.
+SYST:ERR? — зчитати помилку.
+RS-232 параметри: 9600 baud, 8N1, LF.
+################################################################################
+
+LakeShore 335 Temperature Controller (Rev. 1.6 / 2019)
+
+*IDN? — ідентифікатор.
+KRDG? <n> — показання сенсора (канал 1 або 2).
+SETP? <out> — уставка температури.
+SETP <out>,<value> — задати уставку.
+RAMP <out>,<state>,<rate> — рампа (вкл/викл, швидкість).
+HEATER? <out> — потужність нагрівача (%).
+SYST:ERR? — помилка.
+RS-232 параметри: 9600 baud, 8N1, CR+LF.
+################################################################################
+
+Stanford Research Systems SR830 Lock-in Amplifier (2011)
+Док: SR830 DSP Lock-In Amplifier Manual, 2011 edition
+
+Основні RS232/SCPI команди:
+*IDN? — ідентифікація.
+OUTP? 1 — зчитати X компоненту.
+OUTP? 2 — зчитати Y компоненту.
+OUTP? 3 — зчитати R (амплітуду).
+OUTP? 4 — зчитати θ (фазу).
+FREQ? — поточна частота генератора.
+FREQ <value> — встановити частоту генератора.
+SLVL? — амплітуда синхронного сигналу.
+SLVL <value> — встановити амплітуду.
+OFLT? — фільтр часу (time constant).
+OFLT <n> — вибрати константу часу.
+PHAS? — поточна фаза.
+PHAS <deg> — встановити фазу у градусах.
+SENS? — діапазон чутливості.
+SENS <n> — вибрати чутливість (наприклад, 0 = 2 nV, 26 = 1 V).
+AUTO 0 — автопідбір фази.
+AUTO 1 — автопідбір чутливості.
+AUTO 2 — автопідбір часу інтеграції.
+RS-232 параметри (за замовчуванням):
+
+Baud rate: 9600 (можна змінити 1200–19200)
+Data bits: 8
+Parity: None
+Stop bits: 1
+Flow control: None
+Завершальний символ: CR+LF (\r\n)
+
+################################################################################
+
+
+
+result 
+multi
+
+*IDN?
+
+62	17:15:05.245	KEITHLEY INSTRUMENTS INC.,MODEL 2000,1319343,A20  /A02  wait 70
+624	READ?	17:27:55.234	+1.26507165E-07 wait 70
+625	READ?	17:27:55.391	+1.09837836E-07 wait 70
+
+LakeShore 335
+18:23:34.412	
+*IDN?	LSCI,MODEL335,LSA2Q6U/LSA2QB6,2.0 wait 5 sec but in documentation writte time should be more than 50 ms
+
+
+SR830
+475	
+*IDN?	18:26:24.318	Stanford_Research_Systems,SR830,s/n42767,ver1.07 waint 70 ms
+476	
+*IDN?	18:26:24.412	Stanford_Research_Systems,SR830,s/n42767,ver1.07

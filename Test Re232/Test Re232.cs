@@ -18,9 +18,11 @@ namespace Measurement_Kits
         private Form_Menu Form_Menu;
         private Keithley2000 _keithley;
         private LakeShore335 _lakeshore;
+        private Lock_in_Amplifier_SR830 _sr830;
         private int measureCounter;
         private CancellationTokenSource _cts;
         private int _timeStepMs;
+        private int waitMs;
         private bool _isRunning = false;
         public Form_Test_RS232(Form_Menu menu)
         {
@@ -30,8 +32,10 @@ namespace Measurement_Kits
             CreatCOM();
             measureCounter = 0;
             _timeStepMs = (int)numericUpDown1.Value;
+            waitMs = (int)numericUpDown_waitms.Value;
             _keithley = new Keithley2000();
             _lakeshore = new LakeShore335();
+            _sr830 = new Lock_in_Amplifier_SR830();
         }       
 
         private void button_SendCommand_Click(object sender, EventArgs e)
@@ -47,22 +51,20 @@ namespace Measurement_Kits
             if (checkedListBox1.GetItemChecked(0))
             {                
                 var time = DateTime.Now.ToString("HH:mm:ss.fff");
-                string respond = _keithley.SendCommand(command);
-                richTextBox_Out.Text += $"{time}\t{respond}\n";
+                string respond = _keithley.SendCommand(command,waitMs);
+                richTextBox_Out.Text += $"{time}\t{command}\t{respond}\n";
             }
             if (checkedListBox1.GetItemChecked(1))
-            {
-                MessageBox.Show("Multimetr");
+            {                
                 var time = DateTime.Now.ToString("HH:mm:ss.fff");
-                string respond = _lakeshore.SendCommand(command);
-                richTextBox_Out.Text += $"{time}\t{respond}\n";
+                string respond = _lakeshore.SendCommand(command, waitMs);
+                richTextBox_Out.Text += $"{time}\t{command}\t{respond}\n";
             }
             if (checkedListBox1.GetItemChecked(2))
-            {
-                MessageBox.Show("Multimetr");
+            {                
                 var time = DateTime.Now.ToString("HH:mm:ss.fff");
-                string respond = _keithley.SendCommand(command);
-                richTextBox_Out.Text += $"{time}\t{respond}\n";
+                string respond = _sr830.SendCommand(command, waitMs);
+                richTextBox_Out.Text += $"{time}\t{command}\t{respond}\n";
             }
         }
         
@@ -82,10 +84,10 @@ namespace Measurement_Kits
                 {
                     lastTick += _timeStepMs;
                     var time = DateTime.Now.ToString("HH:mm:ss.fff");
-                    string respond = Device.SendCommand(command);
+                    string respond = Device.SendCommand(command, waitMs);
                     this.Invoke(new Action(() =>
                     {
-                        richTextBox_Out.Text += $"{measureCounter}\t{time}\t{respond}\n";
+                        richTextBox_Out.Text += $"{measureCounter}\t{command}\t{time}\t{respond}\n";
                     }));
                     measureCounter++;
                 }
@@ -137,7 +139,7 @@ namespace Measurement_Kits
                     }
                     if (checkedListBox1.GetItemChecked(2))
                     {
-                        await Task.Run(() => MeasurementLoop(_cts.Token, command, null));
+                        await Task.Run(() => MeasurementLoop(_cts.Token, command, _sr830));
                     }                    
                 }
                 else
@@ -164,8 +166,17 @@ namespace Measurement_Kits
         }
 
         private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
-        {            
-            bool status = _keithley.Connect(comboBox1.Text);
+        {
+            string portName = comboBox1.Text;
+            int baudRate = 9600;              // типово 9600
+            int dataBits = 8;                 // стандарт
+            Parity parity = Parity.None;      // без парності
+            StopBits stopBits = StopBits.One; // 1 стоп-біт
+            Handshake flowControl = Handshake.None; // без керування потоком
+            string terminator = "\r\n";       // CR+LF
+            int timeout = 2000;
+            _keithley = new Keithley2000();
+            bool status = _keithley.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
             if (status)
             {
                 button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
@@ -177,8 +188,18 @@ namespace Measurement_Kits
         }
 
         private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
-        {            
-            bool status = _lakeshore.Connect(comboBox2.Text);
+        {
+            //RS-232 параметри: 9600 baud, 8N1, CR+LF.
+            string portName = comboBox2.Text;
+            int baudRate = 57600;              // 300–115200 (типово 9600)
+            int dataBits = 7;                 // часто 7
+            Parity parity = Parity.Odd;      // іноді Even, залежить від моделі
+            StopBits stopBits = StopBits.One;
+            Handshake flowControl = Handshake.None;
+            string terminator = "\n";         // LF
+            int timeout = 2000;
+            _lakeshore = new LakeShore335();
+            bool status = _lakeshore.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
             if (status)
             {
                 button_ConnectToLakeShore.BackColor = System.Drawing.Color.Green;
@@ -195,10 +216,12 @@ namespace Measurement_Kits
 
             comboBox1.Items.AddRange(ports);
             comboBox2.Items.AddRange(ports);
+            comboBox3.Items.AddRange(ports);
             if (ports.Length > 0)
             {
-                comboBox1.SelectedIndex = 0; // вибрати перший порт
-                comboBox2.SelectedIndex = 1;
+                comboBox1.SelectedIndex = 1; // вибрати перший порт
+                comboBox2.SelectedIndex = 2;
+                comboBox3.SelectedIndex = 0;
             }
             else
                 comboBox1.Text = "Немає портів";
@@ -212,6 +235,38 @@ namespace Measurement_Kits
         private void button_Clr_Click(object sender, EventArgs e)
         {
             richTextBox_Out.Text = "";
+        }
+
+        private void button_ConnectToSR830_Click(object sender, EventArgs e)
+        {
+            string portName = comboBox3.Text;
+            int baudRate = 9600;              // типово 9600
+            int dataBits = 8;                 // стандарт
+            Parity parity = Parity.None;      // без парності
+            StopBits stopBits = StopBits.One; // 1 стоп-біт
+            Handshake flowControl = Handshake.None; // без керування потоком
+            string terminator = "\n";       // CR+LF
+            int timeout = 2000;
+            _sr830 = new Lock_in_Amplifier_SR830();
+            bool status = _sr830.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
+            if (status)
+            {
+                button_ConnectToSR830.BackColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                button_ConnectToSR830.BackColor = System.Drawing.Color.Orange;
+            }
+        }
+
+        private void numericUpDown_waitms_ValueChanged(object sender, EventArgs e)
+        {
+            waitMs = (int)numericUpDown_waitms.Value;
+        }
+
+        private void Form_Test_RS232_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

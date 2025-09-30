@@ -1,13 +1,15 @@
-﻿using System;
+﻿using ScottPlot;
+using ScottPlot.TickGenerators.Financial;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO.Ports;
-using ScottPlot;
-using System.Threading;
-using System.IO;
-using System.Diagnostics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace Measurement_Kits
 {
@@ -42,7 +44,8 @@ namespace Measurement_Kits
 
         private void SetupPlots() 
         {
-            Plot1 = new ScottPlot.WinForms.FormsPlot();           
+            Plot1 = new ScottPlot.WinForms.FormsPlot();
+            
             Plot1.Dock = DockStyle.Fill;
             panel1.Controls.Add(Plot1);
             Plot2 = new ScottPlot.WinForms.FormsPlot();
@@ -134,8 +137,16 @@ namespace Measurement_Kits
         }
         private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
         {
+            string portName = comboBox1.Text;
+            int baudRate = 9600;              // типово 9600
+            int dataBits = 8;                 // стандарт
+            Parity parity = Parity.None;      // без парності
+            StopBits stopBits = StopBits.One; // 1 стоп-біт
+            Handshake flowControl = Handshake.None; // без керування потоком
+            string terminator = "\r\n";       // CR+LF
+            int timeout = 2000;
             _keithley = new Keithley2000();
-            bool status = _keithley.Connect(comboBox1.Text);
+            bool status = _keithley.Connect(portName,terminator,flowControl,baudRate,parity,dataBits,stopBits,timeout);
             if (status)
             {
                 button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
@@ -147,8 +158,17 @@ namespace Measurement_Kits
         }
         private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
         {
+            //RS-232 параметри: 9600 baud, 8N1, CR+LF.
+            string portName = comboBox2.Text;
+            int baudRate = 9600;              // 300–115200 (типово 9600)
+            int dataBits = 7;                 // часто 7
+            Parity parity = Parity.None;      // іноді Even, залежить від моделі
+            StopBits stopBits = StopBits.One;
+            Handshake flowControl = Handshake.None;
+            string terminator = "\n";         // LF
+            int timeout = 2000;
             _lakeshore = new LakeShore335();
-            bool status = _lakeshore.Connect(comboBox2.Text);
+            bool status = _lakeshore.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
             if (status)
             {
                 button_ConnectToLakeShore.BackColor = System.Drawing.Color.Green;

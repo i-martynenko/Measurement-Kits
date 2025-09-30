@@ -8,14 +8,35 @@ public abstract class InstrumentBase
     protected SerialPort serialPort;
 
     public bool IsConnected => serialPort != null && serialPort.IsOpen;
-
-    public virtual bool Connect(string portName, int baudRate = 9600, int timeout = 2000)
+    /*
+    private string portName;
+    private string newLine = "\r\n";
+    private Handshake handshake = Handshake.None;
+    private int baudRate = 9600;
+    private Parity parity = Parity.None;
+    private int dataBits = 8;
+    private StopBits stopBits = StopBits.One;
+    private int timeout = 2000;
+    */
+    public virtual bool Connect(
+        string portName,
+        string newLine = "\r\n",
+        Handshake handshake = Handshake.None,
+        int baudRate = 9600,
+        Parity parity = Parity.None,
+        int dataBits = 8,
+        StopBits stopBits = StopBits.One,
+        int timeout = 2000)
     {
         try
         {
-            serialPort = new SerialPort(portName, baudRate);
-            serialPort.ReadTimeout = timeout;
-            serialPort.WriteTimeout = timeout;
+            serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits)
+            {
+                Handshake = handshake,
+                ReadTimeout = timeout,
+                WriteTimeout = timeout,
+                NewLine = newLine
+            };            
             serialPort.Open();
             return true;
         }
@@ -28,7 +49,16 @@ public abstract class InstrumentBase
             return false;
         }
     }
-    public bool ConnectAndCheck(string portName, string expectedId, int baudRate = 9600, int timeout = 2000)
+    public bool ConnectAndCheck(
+        string portName,
+        string expectedId,
+        string newLine = "\r\n",
+        Handshake handshake = Handshake.None,
+        int baudRate = 9600,
+        Parity parity = Parity.None,
+        int dataBits = 8,
+        StopBits stopBits = StopBits.One,
+        int timeout = 2000)
     {
         try
         {
@@ -42,8 +72,12 @@ public abstract class InstrumentBase
 
             if (response.Contains(expectedId))
                 return true;
-            else
+            else 
+            {
+                Disconnect();
                 throw new Exception($"Невідомий пристрій: {response}");
+            }
+                
         }
         catch (Exception ex)
         {
@@ -79,7 +113,7 @@ public abstract class InstrumentBase
 
             // Читаємо все з буфера
             string response = serialPort.ReadExisting().Trim();
-            response = $"Good - {command}";
+            //response = $"Good - {command}";
             // Додатково можна перевірити, чи відповідь порожня
             if (string.IsNullOrEmpty(response))
             {
