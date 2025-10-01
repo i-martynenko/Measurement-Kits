@@ -3,39 +3,47 @@ using System.IO.Ports;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-public abstract class InstrumentBase
+public abstract class DeviceBase
 {
+    protected int BaudRate;
+    protected int DataBits;
+    protected Parity Parity;
+    protected StopBits StopBits;
+    protected string Terminator;
+    protected Handshake Handshake;
+    protected int Timeout;
+    protected string IndificateName;
+    protected DeviceBase(
+        int baudRate,
+        int dataBits,
+        Parity parity,
+        StopBits stopBits,
+        string terminator,
+        Handshake handshake,
+        int timeout)
+    {
+        Terminator = terminator;
+        Handshake = handshake;
+        BaudRate = baudRate;
+        Parity = parity;
+        DataBits = dataBits;
+        StopBits = stopBits;
+        Timeout = timeout;
+    }
     protected SerialPort serialPort;
 
     public bool IsConnected => serialPort != null && serialPort.IsOpen;
-    /*
-    private string portName;
-    private string newLine = "\r\n";
-    private Handshake handshake = Handshake.None;
-    private int baudRate = 9600;
-    private Parity parity = Parity.None;
-    private int dataBits = 8;
-    private StopBits stopBits = StopBits.One;
-    private int timeout = 2000;
-    */
-    public virtual bool Connect(
-        string portName,
-        string newLine = "\r\n",
-        Handshake handshake = Handshake.None,
-        int baudRate = 9600,
-        Parity parity = Parity.None,
-        int dataBits = 8,
-        StopBits stopBits = StopBits.One,
-        int timeout = 2000)
+    
+    public virtual bool Connect(string portName)
     {
         try
         {
-            serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits)
+            serialPort = new SerialPort(portName, BaudRate, Parity, DataBits, StopBits)
             {
-                Handshake = handshake,
-                ReadTimeout = timeout,
-                WriteTimeout = timeout,
-                NewLine = newLine
+                Handshake = Handshake,
+                ReadTimeout = Timeout,
+                WriteTimeout = Timeout,
+                NewLine = Terminator
             };            
             serialPort.Open();
             return true;
@@ -49,33 +57,29 @@ public abstract class InstrumentBase
             return false;
         }
     }
-    public bool ConnectAndCheck(
-        string portName,
-        string expectedId,
-        string newLine = "\r\n",
-        Handshake handshake = Handshake.None,
-        int baudRate = 9600,
-        Parity parity = Parity.None,
-        int dataBits = 8,
-        StopBits stopBits = StopBits.One,
-        int timeout = 2000)
+    public bool ConnectAndCheck(string portName)
     {
         try
         {
-            serialPort = new SerialPort(portName, 9600);
-            serialPort.ReadTimeout = timeout;
-            serialPort.WriteTimeout = timeout;
+            serialPort = new SerialPort(portName, BaudRate, Parity, DataBits, StopBits)
+            {
+                Handshake = Handshake,
+                ReadTimeout = Timeout,
+                WriteTimeout = Timeout,
+                NewLine = Terminator
+            };
             serialPort.Open();
+            string response = SendCommand("*IDN?");            
 
-            serialPort.WriteLine("*IDN?");
-            string response = serialPort.ReadLine();
-
-            if (response.Contains(expectedId))
+            if (response.Contains(IndificateName))
                 return true;
             else 
             {
+
                 Disconnect();
+                return false;
                 throw new Exception($"Невідомий пристрій: {response}");
+                
             }
                 
         }
@@ -93,7 +97,7 @@ public abstract class InstrumentBase
             serialPort.Close();
     }
     private Random _rnd = new Random();
-    public virtual string SendCommand(string command, int waitMs = 20)
+    public virtual string SendCommand(string command, int waitMs = 50)
     {
         if (!IsConnected) return null;
 
@@ -122,18 +126,7 @@ public abstract class InstrumentBase
             }
 
             return response;
-            //return serialPort.ReadLine(); // для SCPI-приладів
-            // Наприклад, опір 1–10 кОм
-
-
-            /*
-            if (command == "EMUL-Keithley") { return $"{1000.0 + _rnd.NextDouble() * 9000.0} OHM"; }
-            if (command == "EMUL-LakeShore") { return $"{290.0 + _rnd.NextDouble() * 20.0} OHM"; }
-            else
-            {
-                return serialPort.ReadLine();
-            }
-            */
+            
         }
         catch (TimeoutException)
         {
@@ -146,22 +139,7 @@ public abstract class InstrumentBase
             return null;
         }
     }
-    public virtual string SendCommandTest(string command)
-    {
-        if (!IsConnected) return null;
-
-        try
-        {
-            serialPort.WriteLine(command);
-            return serialPort.ReadLine(); // для SCPI-приладів          
-
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Помилка обміну: {ex.Message}");
-            return null;
-        }
-    }
+    
     public abstract object ParseResponse(string response);
     public virtual object ParseResponse2(string response) 
     {

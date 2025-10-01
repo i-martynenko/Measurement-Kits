@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using System.Reflection;
-
+using System.IO.Ports;
 namespace Measurement_Kits
 {
-    class LakeShore335 : InstrumentBase
+   
+    class LakeShore335 : DeviceBase
     {
         string[] res;
-        public LakeShore335() 
+        public LakeShore335() : base(57600, 7, Parity.Odd, StopBits.One, "\n", Handshake.None, 2000)
         {
             var list = new List<string>();
             List<string> ress = new List<string>();

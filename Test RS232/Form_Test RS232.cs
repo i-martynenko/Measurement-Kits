@@ -240,15 +240,9 @@ namespace Measurement_Kits
         private void button_ConnectToSR830_Click(object sender, EventArgs e)
         {
             string portName = comboBox3.Text;
-            int baudRate = 9600;              // типово 9600
-            int dataBits = 8;                 // стандарт
-            Parity parity = Parity.None;      // без парності
-            StopBits stopBits = StopBits.One; // 1 стоп-біт
-            Handshake flowControl = Handshake.None; // без керування потоком
-            string terminator = "\n";       // CR+LF
-            int timeout = 2000;
+           
             _sr830 = new Lock_in_Amplifier_SR830();
-            bool status = _sr830.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
+            bool status = _sr830.Connect(portName);
             if (status)
             {
                 button_ConnectToSR830.BackColor = System.Drawing.Color.Green;

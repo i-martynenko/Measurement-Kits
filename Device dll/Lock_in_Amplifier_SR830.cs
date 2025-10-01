@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
 using System.Windows.Forms;
-
+using System.IO.Ports;
 namespace Measurement_Kits
 {
-    public class Lock_in_Amplifier_SR830 : InstrumentBase
+  
+    public class Lock_in_Amplifier_SR830 : DeviceBase
     {
         string[] res;
-        public Lock_in_Amplifier_SR830()
+        public Lock_in_Amplifier_SR830() : base(9600, 8, Parity.None, StopBits.One, "\n", Handshake.None, 2000)
         {
             var list = new List<string>();
             List<string> ress = new List<string>();

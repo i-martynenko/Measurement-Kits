@@ -101,7 +101,7 @@
     <Compile Include="Menu\Form_Menu.Designer.cs">
       <DependentUpon>Form_Menu.cs</DependentUpon>
     </Compile>
-    <Compile Include="Device dll\InstrumentBase.cs" />
+    <Compile Include="Device dll\DeviceBase.cs" />
     <Compile Include="Device dll\Keithley2000.cs" />
     <Compile Include="Device dll\LakeShore335.cs" />
     <Compile Include="Program.cs" />

@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
 using System.Windows.Forms;
+using System.IO.Ports;
 
 namespace Measurement_Kits
 {
-    public class Keithley2000 : InstrumentBase
+    public class Keithley2000 : DeviceBase
     {
+        
+       
         string[] res;
-        public Keithley2000() 
+        public Keithley2000() : base(9600,8, Parity.None,StopBits.One,"\r\n",Handshake.None,2000) 
         {
+            
             var list = new List<string>();
             List<string> ress = new List<string>();
             string resourceName = "Measurement_Kits.1.txt";
@@ -50,7 +54,12 @@ namespace Measurement_Kits
                 return value;
             return response;
         }
-
+        public void SetDC_I() { }
+        public void SetAC_I() { }
+        public void SetDC_V() { }
+        public void SetAC_V() { }
+        public void SetDC_R() { }
+        public void SetAC_R() { }
         public double MeasureVoltage()
         {
             string resp = SendCommand("MEAS:VOLT:DC?");
