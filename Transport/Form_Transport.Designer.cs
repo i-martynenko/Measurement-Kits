@@ -41,7 +41,7 @@ namespace Measurement_Kits
             this.checkBox_Write = new System.Windows.Forms.CheckBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.label_Temp = new System.Windows.Forms.Label();
+            this.label_TempSpeed = new System.Windows.Forms.Label();
             this.label_path = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
@@ -51,6 +51,7 @@ namespace Measurement_Kits
             this.label1 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.label_TempNow = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -134,10 +135,11 @@ namespace Measurement_Kits
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel3.Controls.Add(this.label_TempNow);
             this.panel3.Controls.Add(this.checkBox_Write);
             this.panel3.Controls.Add(this.comboBox2);
             this.panel3.Controls.Add(this.comboBox1);
-            this.panel3.Controls.Add(this.label_Temp);
+            this.panel3.Controls.Add(this.label_TempSpeed);
             this.panel3.Controls.Add(this.label_path);
             this.panel3.Controls.Add(this.label2);
             this.panel3.Controls.Add(this.button3);
@@ -177,15 +179,15 @@ namespace Measurement_Kits
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 8;
             // 
-            // label_Temp
+            // label_TempSpeed
             // 
-            this.label_Temp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label_Temp.AutoSize = true;
-            this.label_Temp.Location = new System.Drawing.Point(14, 712);
-            this.label_Temp.Name = "label_Temp";
-            this.label_Temp.Size = new System.Drawing.Size(35, 13);
-            this.label_Temp.TabIndex = 7;
-            this.label_Temp.Text = "label4";
+            this.label_TempSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label_TempSpeed.AutoSize = true;
+            this.label_TempSpeed.Location = new System.Drawing.Point(14, 712);
+            this.label_TempSpeed.Name = "label_TempSpeed";
+            this.label_TempSpeed.Size = new System.Drawing.Size(35, 13);
+            this.label_TempSpeed.TabIndex = 7;
+            this.label_TempSpeed.Text = "label4";
             // 
             // label_path
             // 
@@ -194,7 +196,7 @@ namespace Measurement_Kits
             this.label_path.Name = "label_path";
             this.label_path.Size = new System.Drawing.Size(54, 13);
             this.label_path.TabIndex = 6;
-            this.label_path.Text = "A:\\Info.txt";
+            this.label_path.Text = "C:\\Info.txt";
             this.label_path.Click += new System.EventHandler(this.label_path_Click);
             // 
             // label2
@@ -270,6 +272,16 @@ namespace Measurement_Kits
             this.label1.TabIndex = 1;
             this.label1.Text = "Multimetr";
             // 
+            // label_TempNow
+            // 
+            this.label_TempNow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label_TempNow.AutoSize = true;
+            this.label_TempNow.Location = new System.Drawing.Point(15, 687);
+            this.label_TempNow.Name = "label_TempNow";
+            this.label_TempNow.Size = new System.Drawing.Size(35, 13);
+            this.label_TempNow.TabIndex = 11;
+            this.label_TempNow.Text = "label4";
+            // 
             // Form_Transport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -306,7 +318,7 @@ namespace Measurement_Kits
         private System.Windows.Forms.Label label1;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Label label_Temp;
+        private System.Windows.Forms.Label label_TempSpeed;
         private System.Windows.Forms.Label label_path;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comboBox2;
@@ -316,5 +328,6 @@ namespace Measurement_Kits
         private System.Windows.Forms.Label label_Plot1_Coordinate;
         private System.Windows.Forms.Label label_Plot2_Coordinate;
         private System.Windows.Forms.CheckBox checkBox_Write;
+        private System.Windows.Forms.Label label_TempNow;
     }
 }

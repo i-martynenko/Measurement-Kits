@@ -286,7 +286,8 @@ namespace Measurement_Kits
                         // Оновлюємо label у GUI-потоці
                         this.Invoke(new Action(() =>
                         {
-                            label_Temp.Text = $"Temp Speed = {TempSpeed:f2} K/min";
+                            label_TempNow.Text = $"P{temperature:f}K";
+                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} K/min";
                         }));
 
                     }
@@ -377,7 +378,7 @@ namespace Measurement_Kits
                     // Оновлюємо label у GUI-потоці
                     this.Invoke(new Action(() =>
                     {
-                        label_Temp.Text = $"Temp Speed = {TempSpeed:f2} K/min";
+                        label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} K/min";
                     }));
 
                 }
