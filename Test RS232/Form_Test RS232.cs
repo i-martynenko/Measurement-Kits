@@ -68,7 +68,7 @@ namespace Measurement_Kits
             }
         }
         
-        private async Task MeasurementLoop(CancellationToken token, string command, InstrumentBase Device)
+        private async Task MeasurementLoop(CancellationToken token, string command, DeviceBase Device)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -167,16 +167,9 @@ namespace Measurement_Kits
 
         private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
         {
-            string portName = comboBox1.Text;
-            int baudRate = 9600;              // типово 9600
-            int dataBits = 8;                 // стандарт
-            Parity parity = Parity.None;      // без парності
-            StopBits stopBits = StopBits.One; // 1 стоп-біт
-            Handshake flowControl = Handshake.None; // без керування потоком
-            string terminator = "\r\n";       // CR+LF
-            int timeout = 2000;
+            string portName = comboBox1.Text;            
             _keithley = new Keithley2000();
-            bool status = _keithley.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
+            bool status = _keithley.Connect(portName);
             if (status)
             {
                 button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
@@ -189,17 +182,10 @@ namespace Measurement_Kits
 
         private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
         {
-            //RS-232 параметри: 9600 baud, 8N1, CR+LF.
-            string portName = comboBox2.Text;
-            int baudRate = 57600;              // 300–115200 (типово 9600)
-            int dataBits = 7;                 // часто 7
-            Parity parity = Parity.Odd;      // іноді Even, залежить від моделі
-            StopBits stopBits = StopBits.One;
-            Handshake flowControl = Handshake.None;
-            string terminator = "\n";         // LF
-            int timeout = 2000;
+            
+            string portName = comboBox2.Text;            
             _lakeshore = new LakeShore335();
-            bool status = _lakeshore.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
+            bool status = _lakeshore.Connect(portName);
             if (status)
             {
                 button_ConnectToLakeShore.BackColor = System.Drawing.Color.Green;

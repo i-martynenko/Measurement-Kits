@@ -12,8 +12,11 @@ namespace Measurement_Kits
   
     public class Lock_in_Amplifier_SR830 : DeviceBase
     {
+        // "Stanford_Research_Systems,SR830,s/n42767,ver1.07"
         string[] res;
-        public Lock_in_Amplifier_SR830() : base(9600, 8, Parity.None, StopBits.One, "\n", Handshake.None, 2000)
+        public Lock_in_Amplifier_SR830() : base(9600, 8, Parity.None,
+            StopBits.One, "\n", Handshake.None, 2000,
+            "Stanford_Research_Systems")
         {
             var list = new List<string>();
             List<string> ress = new List<string>();

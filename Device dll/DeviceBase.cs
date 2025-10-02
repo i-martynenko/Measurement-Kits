@@ -20,7 +20,8 @@ public abstract class DeviceBase
         StopBits stopBits,
         string terminator,
         Handshake handshake,
-        int timeout)
+        int timeout,
+        string IndificateName)
     {
         Terminator = terminator;
         Handshake = handshake;
@@ -69,7 +70,7 @@ public abstract class DeviceBase
                 NewLine = Terminator
             };
             serialPort.Open();
-            string response = SendCommand("*IDN?");            
+            string response = SendCommand("*IDN?",100);            
 
             if (response.Contains(IndificateName))
                 return true;

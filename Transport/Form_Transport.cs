@@ -105,8 +105,8 @@ namespace Measurement_Kits
             comboBox2.Items.AddRange(ports);
             if (ports.Length > 0) 
             {
-                comboBox1.SelectedIndex = 0; // вибрати перший порт
-                comboBox2.SelectedIndex = 1;
+                comboBox1.SelectedIndex = 1; // вибрати перший порт
+                comboBox2.SelectedIndex = 2;
             }                
             else
                 comboBox1.Text = "Немає портів";
@@ -137,16 +137,9 @@ namespace Measurement_Kits
         }
         private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
         {
-            string portName = comboBox1.Text;
-            int baudRate = 9600;              // типово 9600
-            int dataBits = 8;                 // стандарт
-            Parity parity = Parity.None;      // без парності
-            StopBits stopBits = StopBits.One; // 1 стоп-біт
-            Handshake flowControl = Handshake.None; // без керування потоком
-            string terminator = "\r\n";       // CR+LF
-            int timeout = 2000;
+            string portName = comboBox1.Text;            
             _keithley = new Keithley2000();
-            bool status = _keithley.Connect(portName,terminator,flowControl,baudRate,parity,dataBits,stopBits,timeout);
+            bool status = _keithley.Connect(portName);
             if (status)
             {
                 button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
@@ -158,17 +151,10 @@ namespace Measurement_Kits
         }
         private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
         {
-            //RS-232 параметри: 9600 baud, 8N1, CR+LF.
-            string portName = comboBox2.Text;
-            int baudRate = 9600;              // 300–115200 (типово 9600)
-            int dataBits = 7;                 // часто 7
-            Parity parity = Parity.None;      // іноді Even, залежить від моделі
-            StopBits stopBits = StopBits.One;
-            Handshake flowControl = Handshake.None;
-            string terminator = "\n";         // LF
-            int timeout = 2000;
+            
+            string portName = comboBox2.Text;            
             _lakeshore = new LakeShore335();
-            bool status = _lakeshore.Connect(portName, terminator, flowControl, baudRate, parity, dataBits, stopBits, timeout);
+            bool status = _lakeshore.Connect(portName);
             if (status)
             {
                 button_ConnectToLakeShore.BackColor = System.Drawing.Color.Green;
@@ -242,7 +228,8 @@ namespace Measurement_Kits
             var sw = new Stopwatch();
             sw.Start();
             long lastTick = sw.ElapsedTicks;
-
+            _keithley.Set_INIT_COUNT_ON();
+            
             while (!token.IsCancellationRequested)
             {
                 // Обчислюємо час, який пройшов
@@ -255,8 +242,8 @@ namespace Measurement_Kits
                     var time = DateTime.Now.ToString("HH:mm:ss.fff");
 
                     //  зчитування даних з приладів
-                    double resistance = _keithley.MeasureResistance(measureCounter);
-                    double temperature = _lakeshore.MeasureTemperature(measureCounter);
+                    double resistance = _keithley.Get_FETCh();
+                    double temperature = _lakeshore.GetTemperature_K();
                     AddTemperature(temperature);
                     // Запис у файл
                     //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
