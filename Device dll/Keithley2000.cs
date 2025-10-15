@@ -66,8 +66,7 @@ namespace Measurement_Kits
         }
         public double MeasureResistance(int i)
         {
-            string resp = SendCommand("EMUL-Keithley");
-            resp = res[i];
+            string resp = SendCommand("EMUL-Keithley");           
             return resp != null ? (double)ParseResponse2(resp) : double.NaN;
         }
 

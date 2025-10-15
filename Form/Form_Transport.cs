@@ -304,6 +304,7 @@ namespace Measurement_Kits
             }
 
         }
+        /*
         private async Task MeasurementLoop_LastVersion(CancellationToken token,bool read_time = false)
         {
             string filePath = label_path.Text;
@@ -389,6 +390,7 @@ namespace Measurement_Kits
                 await Task.Delay(_timeStepMs, token);
             }
         }
+        */
         private void AddTemperature(double temp)
         {
             var now = DateTime.Now;
@@ -410,8 +412,8 @@ namespace Measurement_Kits
                 }
             }
         }
+        
 
-       
 
         private void button_Plot1Scale_Click(object sender, EventArgs e)
         {

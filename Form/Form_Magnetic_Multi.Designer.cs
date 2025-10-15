@@ -1,7 +1,6 @@
-﻿
-namespace Measurement_Kits
+﻿namespace Measurement_Kits
 {
-    partial class Form_Transport
+    partial class Form_Magnetic_Multi
     {
         /// <summary>
         /// Required designer variable.
@@ -38,6 +37,7 @@ namespace Measurement_Kits
             this.label_Plot2_Coordinate = new System.Windows.Forms.Label();
             this.button_Plot2Scale = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.label_TempNow = new System.Windows.Forms.Label();
             this.checkBox_Write = new System.Windows.Forms.CheckBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -51,7 +51,6 @@ namespace Measurement_Kits
             this.label1 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.label_TempNow = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -153,6 +152,16 @@ namespace Measurement_Kits
             this.panel3.Size = new System.Drawing.Size(238, 744);
             this.panel3.TabIndex = 3;
             // 
+            // label_TempNow
+            // 
+            this.label_TempNow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label_TempNow.AutoSize = true;
+            this.label_TempNow.Location = new System.Drawing.Point(15, 687);
+            this.label_TempNow.Name = "label_TempNow";
+            this.label_TempNow.Size = new System.Drawing.Size(35, 13);
+            this.label_TempNow.TabIndex = 11;
+            this.label_TempNow.Text = "label4";
+            // 
             // checkBox_Write
             // 
             this.checkBox_Write.AutoSize = true;
@@ -204,9 +213,9 @@ namespace Measurement_Kits
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(14, 82);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(59, 13);
+            this.label2.Size = new System.Drawing.Size(84, 13);
             this.label2.TabIndex = 5;
-            this.label2.Text = "LakeShore";
+            this.label2.Text = "Lock-in Amplifier";
             // 
             // button3
             // 
@@ -272,17 +281,7 @@ namespace Measurement_Kits
             this.label1.TabIndex = 1;
             this.label1.Text = "Multimetr";
             // 
-            // label_TempNow
-            // 
-            this.label_TempNow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label_TempNow.AutoSize = true;
-            this.label_TempNow.Location = new System.Drawing.Point(15, 687);
-            this.label_TempNow.Name = "label_TempNow";
-            this.label_TempNow.Size = new System.Drawing.Size(35, 13);
-            this.label_TempNow.TabIndex = 11;
-            this.label_TempNow.Text = "label4";
-            // 
-            // Form_Transport
+            // Form_Magnetic_Multi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -290,8 +289,8 @@ namespace Measurement_Kits
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.Name = "Form_Transport";
-            this.Text = "Transport";
+            this.Name = "Form_Magnetic_Multi";
+            this.Text = "Magnetic_Multi";
             this.Load += new System.EventHandler(this.Transport_Load);
             this.SizeChanged += new System.EventHandler(this.Form_Transport_SizeChanged);
             this.panel1.ResumeLayout(false);

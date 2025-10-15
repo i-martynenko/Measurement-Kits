@@ -41,5 +41,11 @@ namespace Measurement_Kits
             var form_Test_RS232 = new Form_Test_RS232(this);
             GlobalExitHelper.SwitchTo(this, form_Test_RS232, hideInsteadOfClose: true);
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var form_Magnetic_Multi = new Form_Magnetic_Multi(this);
+            GlobalExitHelper.SwitchTo(this, form_Magnetic_Multi, hideInsteadOfClose: true);
+        }
     }
     }
