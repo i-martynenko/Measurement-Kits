@@ -14,40 +14,13 @@ namespace Measurement_Kits
     class LakeShore335 : DeviceBase
     {
         //"LSCI,MODEL335,LSA2Q6U/LSA2QB6,2.0"
-        string[] res;
+        
         public LakeShore335() : base(57600, 7, Parity.Odd,
             StopBits.One, "\n", Handshake.None, 2000,
             "LSCI,MODEL335")
         {
-            var list = new List<string>();
-            List<string> ress = new List<string>();
-            string resourceName = "Measurement_Kits.1.txt";
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
-            {
-                if (stream == null)
-                {
-                    MessageBox.Show($"Не вдалося знайти ресурс {resourceName}");
-                    return;
-                }
-
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        list.Add(line);
-                    }
-                }
-            }
-            for (int i = 0; i < list.Count; i++)
-            {
-                string temp = list[i];
-                temp = temp.Trim();
-                temp = temp.Split('\t')[0]; // 3 - 2
-                Console.WriteLine();
-                ress.Add(temp);
-            }
-            res = ress.ToArray();
+           
+            
         }
         public override object ParseResponse(string response)
         {
@@ -60,29 +33,6 @@ namespace Measurement_Kits
             
             string resp = SendCommand($"KRDG? {channel}",wait);
             return resp != null ? (double)ParseResponse2(resp) : double.NaN;    
-        }
-        public double MeasureVoltage()
-        {
-            string resp = SendCommand("MEAS:VOLT:DC?");
-            return resp != null ? (double)ParseResponse(resp) : double.NaN;
-        }
-
-        public double MeasureCurrent()
-        {
-            
-            string resp = SendCommand("MEAS:CURR:DC?");
-            return resp != null ? (double)ParseResponse(resp) : double.NaN;
-        }
-        public double MeasureTemperature() 
-        {
-            string resp = SendCommand("EMUL-LakeShore");
-            return resp != null ? (double)ParseResponse2(resp) : double.NaN;
-        }
-        public double MeasureTemperature(int i)
-        {
-            string resp = SendCommand("EMUL-Keithley");
-            resp = res[i];
-            return resp != null ? (double)ParseResponse2(resp) : double.NaN;
         }
     }
 }

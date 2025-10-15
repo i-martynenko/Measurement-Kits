@@ -98,7 +98,7 @@ public abstract class DeviceBase
             serialPort.Close();
     }
     private Random _rnd = new Random();
-    public virtual string SendCommand(string command, int waitMs = 50)
+    public virtual string SendCommand(string command, int waitMs = 100)
     {
         if (!IsConnected) return null;
 

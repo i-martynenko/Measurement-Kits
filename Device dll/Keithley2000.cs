@@ -14,41 +14,13 @@ namespace Measurement_Kits
     {
 
         // "KEITHLEY INSTRUMENTS INC.,MODEL 2000,1319343,A20  /A02"
-        string[] res;
+       
         public Keithley2000() : base(9600,8, Parity.None,
             StopBits.One,"\r\n",Handshake.None,2000,
             "KEITHLEY INSTRUMENTS INC.") 
         {
             
-            var list = new List<string>();
-            List<string> ress = new List<string>();
-            string resourceName = "Measurement_Kits.1.txt";
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
-            {
-                if (stream == null)
-                {
-                    MessageBox.Show($"Не вдалося знайти ресурс {resourceName}");
-                    return;
-                }
-
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        list.Add(line);
-                    }
-                }
-            }            
-            for (int i = 0; i < list.Count; i++)
-            {
-                string temp = list[i];
-                temp = temp.Trim();
-                temp = temp.Split('\t')[1]; // 3 - 2
-                Console.WriteLine();
-                ress.Add(temp);
-            }
-            res = ress.ToArray();
+           
         }
         public override object ParseResponse(string response)
         {
@@ -56,12 +28,7 @@ namespace Measurement_Kits
                 return value;
             return response;
         }
-        public void SetDC_I() { }
-        public void SetAC_I() { }
-        public void SetDC_V() { }
-        public void SetAC_V() { }
-        public void SetDC_R() { }
-        public void SetAC_R() { }
+        
         
         public void Set_INIT_COUNT_ON(int waitMs = 100) 
         {
@@ -81,20 +48,20 @@ namespace Measurement_Kits
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
             
         }   
-        public double MeasureVoltage()
+        public double MeasureVoltage_DC()
         {
             string resp = SendCommand("MEAS:VOLT:DC?");
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
         }
 
-        public double MeasureCurrent()
+        public double MeasureCurrent_DC()
         {
             string resp = SendCommand("MEAS:CURR:DC?");
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
         }
         public double MeasureResistance()
         {
-            string resp = SendCommand("EMUL-Keithley");            
+            string resp = SendCommand("MEAS:RES?");            
             return resp != null ? (double)ParseResponse2(resp) : double.NaN;
         }
         public double MeasureResistance(int i)
