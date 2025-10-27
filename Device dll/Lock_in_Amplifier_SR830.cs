@@ -13,40 +13,12 @@ namespace Measurement_Kits
     public class Lock_in_Amplifier_SR830 : DeviceBase
     {
         // "Stanford_Research_Systems,SR830,s/n42767,ver1.07"
-        string[] res;
+        
         public Lock_in_Amplifier_SR830() : base(9600, 8, Parity.None,
             StopBits.One, "\n", Handshake.None, 2000,
             "Stanford_Research_Systems")
         {
-            var list = new List<string>();
-            List<string> ress = new List<string>();
-            string resourceName = "Measurement_Kits.1.txt";
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
-            {
-                if (stream == null)
-                {
-                    MessageBox.Show($"Не вдалося знайти ресурс {resourceName}");
-                    return;
-                }
-
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        list.Add(line);
-                    }
-                }
-            }
-            for (int i = 0; i < list.Count; i++)
-            {
-                string temp = list[i];
-                temp = temp.Trim();
-                temp = temp.Split('\t')[1]; // 3 - 2
-                Console.WriteLine();
-                ress.Add(temp);
-            }
-            res = ress.ToArray();
+           
         }
         public override object ParseResponse(string response)
         {
@@ -54,36 +26,34 @@ namespace Measurement_Kits
                 return value;
             return response;
         }
-
-        public double MeasureVoltage()
+        
+        public double GetAmplitude(int waitMs = 25)
         {
-            string resp = SendCommand("MEAS:VOLT:DC?");
+            string resp = SendCommand("SLVL?", waitMs);
+            return resp != null ? (double)ParseResponse(resp) : double.NaN;
+        }
+        public double GetFrequency(int waitMs = 25)
+        {
+            string resp = SendCommand("FREQ?", waitMs);
+            return resp != null ? (double)ParseResponse(resp) : double.NaN;
+        }
+        public double GetPhase(int waitMs = 25)
+        {
+            string resp = SendCommand("PHAS?", waitMs);
+            return resp != null ? (double)ParseResponse(resp) : double.NaN;
+        }
+        public double GetDisplayChannel_1(int waitMs = 45)
+        {
+            string resp = SendCommand("OUTR? 1", waitMs);
+            return resp != null ? (double)ParseResponse(resp) : double.NaN;
+        }
+        public double GetDisplayChannel_2(int waitMs = 45)
+        {
+            string resp = SendCommand("OUTR? 2", waitMs);
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
         }
 
-        public double MeasureCurrent()
-        {
-            string resp = SendCommand("MEAS:CURR:DC?");
-            return resp != null ? (double)ParseResponse(resp) : double.NaN;
-        }
-        public double MeasureResistance()
-        {
-            string resp = SendCommand("EMUL-Keithley");
-            return resp != null ? (double)ParseResponse2(resp) : double.NaN;
-        }
-        public double MeasureResistance(int i)
-        {
-            string resp = SendCommand("EMUL-Keithley");
-            resp = res[i];
-            return resp != null ? (double)ParseResponse2(resp) : double.NaN;
-        }
-
+        
 
     }
 }
-
-
-
-
-
-//Lock_in_Amplifier_SR830
