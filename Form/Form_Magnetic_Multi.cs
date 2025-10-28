@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 //Form_Magnetic_Multi
 namespace Measurement_Kits
 {
@@ -223,7 +224,20 @@ namespace Measurement_Kits
                 }
             }
             //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-            File.AppendAllText(filePath, "Resistance\tTemperature\n");
+            File.AppendAllText(filePath, "V\tFrequency\tPhase\n");
+            double free = _lock_in_Amplifier_SR830.GetFrequency();
+            double phase = _lock_in_Amplifier_SR830.GetPhase();
+            double ampl = _lock_in_Amplifier_SR830.GetAmplitude();            
+            File.AppendAllText(filePath, $"{ampl:E8}\t{free:E8}\t{phase:E8}\n");
+            if (read_time)
+            {
+                File.AppendAllText(filePath, "Time\tV\tChanne1\tChannel2\n");
+            }
+            else
+            {
+                File.AppendAllText(filePath, "V\tChanne1\tChannel2\n");
+            }
+            
 
             var sw = new Stopwatch();
             sw.Start();
@@ -242,20 +256,22 @@ namespace Measurement_Kits
                     var time = DateTime.Now.ToString("HH:mm:ss.fff");
 
                     //  зчитування даних з приладів
-                    double resistance = _keithley.Get_FETCh();
+                    double channel1 = _keithley.Get_FETCh();
+                    double channel2 = _keithley.Get_FETCh();
+                    double v = _keithley.Get_FETCh();
                     //double temperature = _lakeshore.GetTemperature_K();
-                    double temperature = 0;
-                    AddTemperature(temperature);
+                    //double temperature = 0;
+                    AddTemperature(v);
                     // Запис у файл
                     //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
                     string line;
                     if (read_time)
                     {
-                        line = $"{resistance:E8}\t{temperature:E8}\n";
+                        line = $"{time}\t{v:E8}\t{channel1:E8}\t{channel2:E8}\n";                        
                     }
                     else
                     {
-                        line = $"{time}\t{resistance:E8}\t{temperature:E8}\n";
+                        line = $"{v:E8}\t{channel1:E8}\t{channel2:E8}\n";                        
                     }
 
                     File.AppendAllText(filePath, line);
@@ -267,23 +283,23 @@ namespace Measurement_Kits
                         {
                             var first = tempHistory.Peek();
                             var last = tempHistory.Last();
-                            double deltaT = last.Temp - first.Temp;
+                            double deltaT = (last.Temp - first.Temp)*1000.0;
                             double deltaTime = (last.Time - first.Time).TotalSeconds;
-                            TempSpeed = (deltaT / deltaTime) * 60.0; // K/min
+                            TempSpeed = (deltaT / deltaTime) * 60.0; // mV/min
                         }
                         // Оновлюємо label у GUI-потоці
                         this.Invoke(new Action(() =>
                         {
-                            label_TempNow.Text = $"P{temperature:f}K";
-                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} K/min";
+                            label_TempNow.Text = $"P{v * 1000.0:f}mV";
+                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} mV/min";
                         }));
 
                     }
                     // Оновлення графіка на формі
                     this.Invoke(new Action(() =>
                     {
-                        DataLoggerPlot1.Add(temperature, resistance);
-                        DataLoggerPlot2.Add(measureCounter, temperature);
+                        DataLoggerPlot1.Add(v, channel1);
+                        DataLoggerPlot2.Add(measureCounter, v);
                         Plot1.Refresh();
                         Plot2.Refresh();
                     }));
