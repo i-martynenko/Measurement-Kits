@@ -214,28 +214,22 @@ namespace Measurement_Kits
             // якщо файл новий – додаємо заголовки
             if (!File.Exists(filePath))
             {
-                if (read_time)
-                {
-                    File.AppendAllText(filePath, "Resistance\tTemperature\n");
-                }
-                else
-                {
-                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-                }
+               
             }
             //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-            File.AppendAllText(filePath, "V\tFrequency\tPhase\n");
-            double free = _lock_in_Amplifier_SR830.GetFrequency();
+            File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
+            double freq = _lock_in_Amplifier_SR830.GetFrequency();
             double phase = _lock_in_Amplifier_SR830.GetPhase();
-            double ampl = _lock_in_Amplifier_SR830.GetAmplitude();            
-            File.AppendAllText(filePath, $"{ampl:E8}\t{free:E8}\t{phase:E8}\n");
+            double ampl = _lock_in_Amplifier_SR830.GetAmplitude();   
+            
+            File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
             if (read_time)
             {
-                File.AppendAllText(filePath, "Time\tV\tChanne1\tChannel2\n");
+                File.AppendAllText(filePath, "Time\tV\tChanne1\tChannel2\r\n");
             }
             else
             {
-                File.AppendAllText(filePath, "V\tChanne1\tChannel2\n");
+                File.AppendAllText(filePath, "V\tChanne1\tChannel2\r\n");
             }
             
 
@@ -256,22 +250,22 @@ namespace Measurement_Kits
                     var time = DateTime.Now.ToString("HH:mm:ss.fff");
 
                     //  зчитування даних з приладів
-                    double channel1 = _keithley.Get_FETCh();
-                    double channel2 = _keithley.Get_FETCh();
+                    double channel1 = _lock_in_Amplifier_SR830.GetDisplayChannel_1();
                     double v = _keithley.Get_FETCh();
-                    //double temperature = _lakeshore.GetTemperature_K();
-                    //double temperature = 0;
+                    double channel2 = _lock_in_Amplifier_SR830.GetDisplayChannel_2();
+                    
+                    
                     AddTemperature(v);
-                    // Запис у файл
-                    //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
+                    
+                    
                     string line;
                     if (read_time)
                     {
-                        line = $"{time}\t{v:E8}\t{channel1:E8}\t{channel2:E8}\n";                        
+                        line = $"{time}\t{v:E8}\t{channel1:E8}\t{channel2:E8}\r\n";                        
                     }
                     else
                     {
-                        line = $"{v:E8}\t{channel1:E8}\t{channel2:E8}\n";                        
+                        line = $"{v:E8}\t{channel1:E8}\t{channel2:E8}\r\n";                        
                     }
 
                     File.AppendAllText(filePath, line);
@@ -321,93 +315,7 @@ namespace Measurement_Kits
             }
 
         }
-        /*
-        private async Task MeasurementLoop_LastVersion(CancellationToken token,bool read_time = false)
-        {
-            string filePath = label_path.Text;
-
-            // якщо файл новий – додаємо заголовки
-            if (!File.Exists(filePath)) 
-            {
-                if (read_time)
-                {
-                    File.AppendAllText(filePath, "Resistance\tTemperature\n");
-                }
-                else
-                {
-                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-                }
-            }
-                //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-                File.AppendAllText(filePath, "Resistance\tTemperature\n");
-
-            while (!token.IsCancellationRequested)
-            {
-                var time = DateTime.Now.ToString("HH:mm:ss.fff");
-
-                //  зчитування даних з приладів
-                double resistance = _keithley.MeasureResistance(measureCounter);
-                double temperature = _lakeshore.MeasureTemperature(measureCounter);
-                AddTemperature(temperature);
-                // Запис у файл
-                //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
-                string line;
-                if (read_time)
-                {
-                    line = $"{resistance:E8}\t{temperature:E8}\n";
-                }
-                else
-                {
-                    line = $"{time}\t{resistance:E8}\t{temperature:E8}\n";
-                }
-                
-                File.AppendAllText(filePath, line);
-
-                /// Speed Temp
-                measureCounter++;
-                //List_Temperature.Add(temperature);
-                //List_Resistance.Add(resistance);
-                //List_Index.Add(measureCounter);
-                if (measureCounter % 3 == 0) // кожні 3 цикли
-                {
-                    double TempSpeed = 0;
-                    if (tempHistory.Count >= 2)
-                    {
-                        var first = tempHistory.Peek();
-                        var last = tempHistory.Last();
-                        double deltaT = last.Temp - first.Temp;
-                        double deltaTime = (last.Time - first.Time).TotalSeconds;
-                        TempSpeed = (deltaT / deltaTime) * 60.0; // K/min
-                    }
-
-                    // Оновлюємо label у GUI-потоці
-                    this.Invoke(new Action(() =>
-                    {
-                        label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} K/min";
-                    }));
-
-                }
-                // Оновлення графіка на формі
-                this.Invoke(new Action(() =>
-                {
-
-                    // formsPlot1.Plot.AddPoint(resistance, temperature); // приклад, можна 2 графіки
-                    // formsPlot1.Refresh();
-                    // scatterPlot1.
-                    //scatterPlot1.Add(temperature, resistance);
-                    DataLoggerPlot1.Add(temperature, resistance);
-                    DataLoggerPlot2.Add(measureCounter, temperature);
-                    Plot1.Refresh();
-                    Plot2.Refresh();
-
-                    //scatterPlot2.Add(measureCounter, temperature);
-                    //Plot2.Refresh();
-                }));
-
-                await Task.Delay(_timeStepMs, token);
-            }
-        }
-        */
+        
         private void AddTemperature(double temp)
         {
             var now = DateTime.Now;

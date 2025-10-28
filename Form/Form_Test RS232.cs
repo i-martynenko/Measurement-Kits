@@ -248,5 +248,26 @@ namespace Measurement_Kits
         {
 
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var time = DateTime.Now.ToString("HH:mm:ss.fff");
+            double respond = _sr830.GetAmplitude();
+            richTextBox_Out.Text += $"{time}\tAMP\t{respond}\n";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var time = DateTime.Now.ToString("HH:mm:ss.fff");
+            double respond = _sr830.GetFrequency();
+            richTextBox_Out.Text += $"{time}\tGetFrequency\t{respond}\n";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var time = DateTime.Now.ToString("HH:mm:ss.fff");
+            double respond = _sr830.GetPhase();
+            richTextBox_Out.Text += $"{time}\tGetFrequency\t{respond}\n";
+        }
     }
 }

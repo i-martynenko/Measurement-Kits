@@ -27,17 +27,17 @@ namespace Measurement_Kits
             return response;
         }
         
-        public double GetAmplitude(int waitMs = 25)
+        public double GetAmplitude(int waitMs = 45)
         {
             string resp = SendCommand("SLVL?", waitMs);
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
         }
-        public double GetFrequency(int waitMs = 25)
+        public double GetFrequency(int waitMs = 45)
         {
             string resp = SendCommand("FREQ?", waitMs);
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
         }
-        public double GetPhase(int waitMs = 25)
+        public double GetPhase(int waitMs = 45)
         {
             string resp = SendCommand("PHAS?", waitMs);
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
