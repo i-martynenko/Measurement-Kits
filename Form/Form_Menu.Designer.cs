@@ -30,10 +30,10 @@ namespace Measurement_Kits
         private void InitializeComponent()
         {
             this.button_Transport = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.button_Test_Plot = new System.Windows.Forms.Button();
             this.button_Test_RS232 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button_Transport
@@ -45,16 +45,6 @@ namespace Measurement_Kits
             this.button_Transport.Text = "Transport";
             this.button_Transport.UseVisualStyleBackColor = true;
             this.button_Transport.Click += new System.EventHandler(this.button_Transport_Click);
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(87, 109);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(170, 40);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Magnetic susceptibility\r\n Multimete";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
@@ -85,15 +75,25 @@ namespace Measurement_Kits
             this.button_Test_RS232.UseVisualStyleBackColor = true;
             this.button_Test_RS232.Click += new System.EventHandler(this.button_Test_RS232_Click);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(87, 107);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(170, 41);
+            this.button3.TabIndex = 5;
+            this.button3.Text = "Magnetic susceptibility\r\n Multimete";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Form_Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(416, 450);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button_Test_RS232);
             this.Controls.Add(this.button_Test_Plot);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.button_Transport);
             this.Name = "Form_Menu";
             this.Text = "Menu";
@@ -105,10 +105,10 @@ namespace Measurement_Kits
         #endregion
 
         private System.Windows.Forms.Button button_Transport;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button_Test_Plot;
         private System.Windows.Forms.Button button_Test_RS232;
+        private System.Windows.Forms.Button button3;
     }
 }
 

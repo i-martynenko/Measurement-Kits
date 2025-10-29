@@ -213,17 +213,18 @@ namespace Measurement_Kits
             // якщо файл новий – додаємо заголовки
             if (!File.Exists(filePath))
             {
-                if (read_time)
-                {
-                    File.AppendAllText(filePath, "Resistance\tTemperature\r\n");
-                }
-                else
-                {
-                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\r\n");
-                }
+                
             }
             //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-            File.AppendAllText(filePath, "Resistance\tTemperature\r\n");
+            if (read_time)
+            {               
+                File.AppendAllText(filePath, "Time\tTemperature\tResistance\r\n");
+            }
+            else
+            {
+                File.AppendAllText(filePath, "Temperature\tResistance\r\n");
+            }
+            
 
             var sw = new Stopwatch();
             sw.Start();
@@ -250,12 +251,12 @@ namespace Measurement_Kits
                     string line;
                     if (read_time)
                     {
-                        line = $"{resistance:E8}\t{temperature:E8}\r\n";
+                        line = $"{temperature:E8}\t{resistance:E8}\r\n";                        
                     }
                     else
                     {
-                        line = $"{time}\t{resistance:E8}\t{temperature:E8}\r\n";
-                    }
+                        line = $"{time}\t{temperature:E8}\t{resistance:E8}\r\n";
+                    }                    
 
                     File.AppendAllText(filePath, line);                    
                     measureCounter++;                    
@@ -274,7 +275,7 @@ namespace Measurement_Kits
                         this.Invoke(new Action(() =>
                         {
                             label_TempNow.Text = $"P{temperature:f}K";
-                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} K/min";
+                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f3} K/min";
                         }));
 
                     }

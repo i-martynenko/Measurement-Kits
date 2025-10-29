@@ -86,6 +86,7 @@
             this.button_Plot1Scale.TabIndex = 0;
             this.button_Plot1Scale.Text = "Scale";
             this.button_Plot1Scale.UseVisualStyleBackColor = true;
+            this.button_Plot1Scale.Click += new System.EventHandler(this.button_Plot1Scale_Click);
             // 
             // panel2
             // 
@@ -116,6 +117,7 @@
             this.button_Plot2Scale.TabIndex = 1;
             this.button_Plot2Scale.Text = "Scale";
             this.button_Plot2Scale.UseVisualStyleBackColor = true;
+            this.button_Plot2Scale.Click += new System.EventHandler(this.button_Plot2Scale_Click);
             // 
             // panel3
             // 
@@ -193,6 +195,7 @@
             this.label_path.Size = new System.Drawing.Size(54, 13);
             this.label_path.TabIndex = 6;
             this.label_path.Text = "C:\\Info.txt";
+            this.label_path.Click += new System.EventHandler(this.label_path_Click);
             // 
             // label2
             // 
@@ -236,6 +239,7 @@
             0,
             0,
             0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // button_ConnectToLakeShore
             // 
@@ -245,6 +249,7 @@
             this.button_ConnectToLakeShore.Size = new System.Drawing.Size(24, 23);
             this.button_ConnectToLakeShore.TabIndex = 3;
             this.button_ConnectToLakeShore.UseVisualStyleBackColor = false;
+            this.button_ConnectToLakeShore.Click += new System.EventHandler(this.button_ConnectToLakeShore_Click);
             // 
             // button_ConnectToMultimetr
             // 
@@ -254,6 +259,7 @@
             this.button_ConnectToMultimetr.Size = new System.Drawing.Size(24, 23);
             this.button_ConnectToMultimetr.TabIndex = 2;
             this.button_ConnectToMultimetr.UseVisualStyleBackColor = false;
+            this.button_ConnectToMultimetr.Click += new System.EventHandler(this.button_ConnectToMultimetr_Click);
             // 
             // label1
             // 
@@ -273,6 +279,7 @@
             this.button_Menu.TabIndex = 0;
             this.button_Menu.Text = "Menu";
             this.button_Menu.UseVisualStyleBackColor = true;
+            this.button_Menu.Click += new System.EventHandler(this.button_Menu_Click);
             // 
             // Form_Magnetic_Multimetr
             // 
@@ -284,6 +291,8 @@
             this.Controls.Add(this.panel1);
             this.Name = "Form_Magnetic_Multimetr";
             this.Text = "Form_Magnetic_Multimetr";
+            this.Load += new System.EventHandler(this.Form_Magnetic_Multimetr_Load);
+            this.SizeChanged += new System.EventHandler(this.Form_Magnetic_Multimetr_SizeChanged);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
