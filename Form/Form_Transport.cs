@@ -215,15 +215,15 @@ namespace Measurement_Kits
             {
                 if (read_time)
                 {
-                    File.AppendAllText(filePath, "Resistance\tTemperature\n");
+                    File.AppendAllText(filePath, "Resistance\tTemperature\r\n");
                 }
                 else
                 {
-                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
+                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\r\n");
                 }
             }
             //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-            File.AppendAllText(filePath, "Resistance\tTemperature\n");
+            File.AppendAllText(filePath, "Resistance\tTemperature\r\n");
 
             var sw = new Stopwatch();
             sw.Start();
@@ -250,11 +250,11 @@ namespace Measurement_Kits
                     string line;
                     if (read_time)
                     {
-                        line = $"{resistance:E8}\t{temperature:E8}\n";
+                        line = $"{resistance:E8}\t{temperature:E8}\r\n";
                     }
                     else
                     {
-                        line = $"{time}\t{resistance:E8}\t{temperature:E8}\n";
+                        line = $"{time}\t{resistance:E8}\t{temperature:E8}\r\n";
                     }
 
                     File.AppendAllText(filePath, line);                    
@@ -412,8 +412,21 @@ namespace Measurement_Kits
                 }
             }
         }
-        
 
+        private void label_path_Click_1(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                saveFileDialog.DefaultExt = "txt";
+                saveFileDialog.FileName = "data.txt";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    label_path.Text = saveFileDialog.FileName;
+                }
+            }
+        }
 
         private void button_Plot1Scale_Click(object sender, EventArgs e)
         {

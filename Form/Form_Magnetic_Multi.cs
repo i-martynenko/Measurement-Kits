@@ -28,6 +28,7 @@ namespace Measurement_Kits
         private int _timeStepMs; // інтервал у мс (можеш змінювати прямо з форми)
         private Queue<(DateTime Time, double Temp)> tempHistory = new Queue<(DateTime, double)>();
         private int measureCounter = 0; // лічильник вимірів для середнього
+
         public Form_Magnetic_Multi(Form_Menu menu)
         {
             InitializeComponent();
@@ -35,7 +36,7 @@ namespace Measurement_Kits
             GlobalExitHelper.AttachGlobalExit(this);
 
         }
-        private Random _rnd = new Random();
+        //private Random _rnd = new Random();
         private ScottPlot.WinForms.FormsPlot Plot1;
         private ScottPlot.WinForms.FormsPlot Plot2;
 

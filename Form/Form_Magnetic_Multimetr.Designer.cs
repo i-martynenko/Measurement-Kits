@@ -1,7 +1,6 @@
-﻿
-namespace Measurement_Kits
+﻿namespace Measurement_Kits
 {
-    partial class Form_Transport
+    partial class Form_Magnetic_Multimetr
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +29,8 @@ namespace Measurement_Kits
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.button_Menu = new System.Windows.Forms.Button();
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.label_Plot1_Coordinate = new System.Windows.Forms.Label();
             this.button_Plot1Scale = new System.Windows.Forms.Button();
@@ -50,24 +50,12 @@ namespace Measurement_Kits
             this.button_ConnectToLakeShore = new System.Windows.Forms.Button();
             this.button_ConnectToMultimetr = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.button_Menu = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // button_Menu
-            // 
-            this.button_Menu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_Menu.Location = new System.Drawing.Point(154, 9);
-            this.button_Menu.Name = "button_Menu";
-            this.button_Menu.Size = new System.Drawing.Size(75, 23);
-            this.button_Menu.TabIndex = 0;
-            this.button_Menu.Text = "Menu";
-            this.button_Menu.UseVisualStyleBackColor = true;
-            this.button_Menu.Click += new System.EventHandler(this.button_Menu_Click);
             // 
             // panel1
             // 
@@ -78,7 +66,7 @@ namespace Measurement_Kits
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(945, 528);
-            this.panel1.TabIndex = 1;
+            this.panel1.TabIndex = 2;
             // 
             // label_Plot1_Coordinate
             // 
@@ -98,7 +86,6 @@ namespace Measurement_Kits
             this.button_Plot1Scale.TabIndex = 0;
             this.button_Plot1Scale.Text = "Scale";
             this.button_Plot1Scale.UseVisualStyleBackColor = true;
-            this.button_Plot1Scale.Click += new System.EventHandler(this.button_Plot1Scale_Click);
             // 
             // panel2
             // 
@@ -109,7 +96,7 @@ namespace Measurement_Kits
             this.panel2.Location = new System.Drawing.Point(0, 534);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(945, 222);
-            this.panel2.TabIndex = 2;
+            this.panel2.TabIndex = 3;
             // 
             // label_Plot2_Coordinate
             // 
@@ -129,7 +116,6 @@ namespace Measurement_Kits
             this.button_Plot2Scale.TabIndex = 1;
             this.button_Plot2Scale.Text = "Scale";
             this.button_Plot2Scale.UseVisualStyleBackColor = true;
-            this.button_Plot2Scale.Click += new System.EventHandler(this.button_Plot2Scale_Click);
             // 
             // panel3
             // 
@@ -151,7 +137,7 @@ namespace Measurement_Kits
             this.panel3.Location = new System.Drawing.Point(960, 3);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(238, 744);
-            this.panel3.TabIndex = 3;
+            this.panel3.TabIndex = 4;
             // 
             // label_TempNow
             // 
@@ -207,16 +193,15 @@ namespace Measurement_Kits
             this.label_path.Size = new System.Drawing.Size(54, 13);
             this.label_path.TabIndex = 6;
             this.label_path.Text = "C:\\Info.txt";
-            this.label_path.Click += new System.EventHandler(this.label_path_Click_1);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(14, 82);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(59, 13);
+            this.label2.Size = new System.Drawing.Size(84, 13);
             this.label2.TabIndex = 5;
-            this.label2.Text = "LakeShore";
+            this.label2.Text = "Lock-in Amplifier";
             // 
             // button3
             // 
@@ -251,7 +236,6 @@ namespace Measurement_Kits
             0,
             0,
             0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // button_ConnectToLakeShore
             // 
@@ -261,7 +245,6 @@ namespace Measurement_Kits
             this.button_ConnectToLakeShore.Size = new System.Drawing.Size(24, 23);
             this.button_ConnectToLakeShore.TabIndex = 3;
             this.button_ConnectToLakeShore.UseVisualStyleBackColor = false;
-            this.button_ConnectToLakeShore.Click += new System.EventHandler(this.button_ConnectToLakeShore_Click);
             // 
             // button_ConnectToMultimetr
             // 
@@ -271,7 +254,6 @@ namespace Measurement_Kits
             this.button_ConnectToMultimetr.Size = new System.Drawing.Size(24, 23);
             this.button_ConnectToMultimetr.TabIndex = 2;
             this.button_ConnectToMultimetr.UseVisualStyleBackColor = false;
-            this.button_ConnectToMultimetr.Click += new System.EventHandler(this.button_ConnectToMultimetr_Click);
             // 
             // label1
             // 
@@ -282,7 +264,17 @@ namespace Measurement_Kits
             this.label1.TabIndex = 1;
             this.label1.Text = "Multimetr";
             // 
-            // Form_Transport
+            // button_Menu
+            // 
+            this.button_Menu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Menu.Location = new System.Drawing.Point(154, 9);
+            this.button_Menu.Name = "button_Menu";
+            this.button_Menu.Size = new System.Drawing.Size(75, 23);
+            this.button_Menu.TabIndex = 0;
+            this.button_Menu.Text = "Menu";
+            this.button_Menu.UseVisualStyleBackColor = true;
+            // 
+            // Form_Magnetic_Multimetr
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -290,10 +282,8 @@ namespace Measurement_Kits
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.Name = "Form_Transport";
-            this.Text = "Transport";
-            this.Load += new System.EventHandler(this.Transport_Load);
-            this.SizeChanged += new System.EventHandler(this.Form_Transport_SizeChanged);
+            this.Name = "Form_Magnetic_Multimetr";
+            this.Text = "Form_Magnetic_Multimetr";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -307,27 +297,27 @@ namespace Measurement_Kits
 
         #endregion
 
-        private System.Windows.Forms.Button button_Menu;
+        private System.IO.Ports.SerialPort serialPort1;
+        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label_Plot1_Coordinate;
+        private System.Windows.Forms.Button button_Plot1Scale;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label_Plot2_Coordinate;
+        private System.Windows.Forms.Button button_Plot2Scale;
         private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Label label_TempNow;
+        private System.Windows.Forms.CheckBox checkBox_Write;
+        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Label label_TempSpeed;
+        private System.Windows.Forms.Label label_path;
+        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button button_ConnectToLakeShore;
         private System.Windows.Forms.Button button_ConnectToMultimetr;
         private System.Windows.Forms.Label label1;
-        private System.IO.Ports.SerialPort serialPort1;
-        private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Label label_TempSpeed;
-        private System.Windows.Forms.Label label_path;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Button button_Plot1Scale;
-        private System.Windows.Forms.Button button_Plot2Scale;
-        private System.Windows.Forms.Label label_Plot1_Coordinate;
-        private System.Windows.Forms.Label label_Plot2_Coordinate;
-        private System.Windows.Forms.CheckBox checkBox_Write;
-        private System.Windows.Forms.Label label_TempNow;
+        private System.Windows.Forms.Button button_Menu;
     }
 }
