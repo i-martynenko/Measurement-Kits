@@ -262,15 +262,7 @@ namespace Measurement_Kits
                     measureCounter++;                    
                     if (measureCounter % 3 == 0) // кожні 3 цикли
                     {
-                        double TempSpeed = 0;
-                        if (tempHistory.Count >= 2)
-                        {
-                            var first = tempHistory.Peek();
-                            var last = tempHistory.Last();
-                            double deltaT = last.Temp - first.Temp;
-                            double deltaTime = (last.Time - first.Time).TotalSeconds;
-                            TempSpeed = (deltaT / deltaTime) * 60.0; // K/min
-                        }
+                        double TempSpeed = ComputeTemperatureSlope();                        
                         // Оновлюємо label у GUI-потоці
                         this.Invoke(new Action(() =>
                         {
@@ -398,6 +390,27 @@ namespace Measurement_Kits
             tempHistory.Enqueue((now, temp));
             if (tempHistory.Count > 5)
                 tempHistory.Dequeue();
+        }
+        public double ComputeTemperatureSlope()
+        {
+            if (tempHistory.Count < 2)
+                return 0;
+
+            var points = tempHistory.ToArray();
+            int N = points.Length;
+
+            // Робимо час у секундах відносно першого
+            double t0 = points[0].Time.ToOADate();
+            double[] t = points.Select(p => (p.Time.ToOADate() - t0) * 24 * 60).ToArray(); // minute
+            double[] T = points.Select(p => p.Temp).ToArray();
+
+            double sumT = T.Sum(); // SUM temp 
+            double sumt = t.Sum(); //  SUM time normolize
+            double sumtT = t.Zip(T, (x, y) => x * y).Sum(); //SUM  time*Temp
+            double sumt2 = t.Select(x => x * x).Sum(); // SUM t*t
+
+            double a = (N * sumtT - sumt * sumT) / (N * sumt2 - sumt * sumt);
+            return a; // °K/minute
         }
         private void label_path_Click(object sender, EventArgs e)
         {
