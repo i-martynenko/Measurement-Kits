@@ -126,6 +126,10 @@ namespace Measurement_Kits
             Plot1.Refresh();
             Plot2.Refresh();
         }
+        private double ConvertT(double V) 
+        {            
+            return 77.57824 + 57550.8 * V - (7.23941E6) * V*V + (7.8661E8) * V*V*V - (3.478E10) * V*V*V*V;
+        }
         private async Task MeasurementLoop(CancellationToken token, bool read_time = false)
         {
             string filePath = label_path.Text;
@@ -144,11 +148,11 @@ namespace Measurement_Kits
             File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
             if (read_time)
             {
-                File.AppendAllText(filePath, "Time\tV\tChanne1\tChannel2\r\n");
+                File.AppendAllText(filePath, "Time\tV\tT\tChanne1\tChannel2\r\n");
             }
             else
             {
-                File.AppendAllText(filePath, "V\tChanne1\tChannel2\r\n");
+                File.AppendAllText(filePath, "V\tT\tChanne1\tChannel2\r\n");
             }
 
 
@@ -172,19 +176,20 @@ namespace Measurement_Kits
                     double channel1 = _lock_in_Amplifier_SR830.GetDisplayChannel_1();
                     double v = _keithley.Get_FETCh();
                     double channel2 = _lock_in_Amplifier_SR830.GetDisplayChannel_2();
+                    double T = ConvertT(v);
 
 
-                    AddTemperature(v);
+                    AddTemperature(T);
 
 
                     string line;
                     if (read_time)
                     {
-                        line = $"{time}\t{v:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                        line = $"{time}\t{v:E8}\t{T:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
                     }
                     else
                     {
-                        line = $"{v:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                        line = $"{v:E8}\t{T:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
                     }
 
                     File.AppendAllText(filePath, line);
@@ -195,16 +200,16 @@ namespace Measurement_Kits
                         
                         this.Invoke(new Action(() =>
                         {
-                            label_TempNow.Text = $"P{v * 1000.0:f}mV";
-                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f3} mV/min";
+                            label_TempNow.Text = $"P{T:f4}K";
+                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f4} K/min";
                         }));
 
                     }
                     // Оновлення графіка на формі
                     this.Invoke(new Action(() =>
                     {
-                        DataLoggerPlot1.Add(v, channel1);
-                        DataLoggerPlot2.Add(measureCounter, v);
+                        DataLoggerPlot1.Add(T, channel1);
+                        DataLoggerPlot2.Add(measureCounter, T);
                         Plot1.Refresh();
                         Plot2.Refresh();
                     }));
