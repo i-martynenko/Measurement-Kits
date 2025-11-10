@@ -51,6 +51,8 @@
             this.button_ConnectToMultimetr = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button_Menu = new System.Windows.Forms.Button();
+            this.button_Plot1Clear = new System.Windows.Forms.Button();
+            this.button_Plot2Clear = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -61,6 +63,7 @@
             // 
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.button_Plot1Clear);
             this.panel1.Controls.Add(this.label_Plot1_Coordinate);
             this.panel1.Controls.Add(this.button_Plot1Scale);
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -92,6 +95,7 @@
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Controls.Add(this.button_Plot2Clear);
             this.panel2.Controls.Add(this.label_Plot2_Coordinate);
             this.panel2.Controls.Add(this.button_Plot2Scale);
             this.panel2.Location = new System.Drawing.Point(0, 534);
@@ -281,6 +285,28 @@
             this.button_Menu.UseVisualStyleBackColor = true;
             this.button_Menu.Click += new System.EventHandler(this.button_Menu_Click);
             // 
+            // button_Plot1Clear
+            // 
+            this.button_Plot1Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Plot1Clear.Location = new System.Drawing.Point(857, 44);
+            this.button_Plot1Clear.Name = "button_Plot1Clear";
+            this.button_Plot1Clear.Size = new System.Drawing.Size(75, 23);
+            this.button_Plot1Clear.TabIndex = 2;
+            this.button_Plot1Clear.Text = "Clr";
+            this.button_Plot1Clear.UseVisualStyleBackColor = true;
+            this.button_Plot1Clear.Click += new System.EventHandler(this.button_Plot1Clear_Click);
+            // 
+            // button_Plot2Clear
+            // 
+            this.button_Plot2Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Plot2Clear.Location = new System.Drawing.Point(857, 44);
+            this.button_Plot2Clear.Name = "button_Plot2Clear";
+            this.button_Plot2Clear.Size = new System.Drawing.Size(75, 23);
+            this.button_Plot2Clear.TabIndex = 3;
+            this.button_Plot2Clear.Text = "Clr";
+            this.button_Plot2Clear.UseVisualStyleBackColor = true;
+            this.button_Plot2Clear.Click += new System.EventHandler(this.button_Plot2Clear_Click);
+            // 
             // Form_Magnetic_Multimetr
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -328,5 +354,7 @@
         private System.Windows.Forms.Button button_ConnectToMultimetr;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button_Menu;
+        private System.Windows.Forms.Button button_Plot1Clear;
+        private System.Windows.Forms.Button button_Plot2Clear;
     }
 }

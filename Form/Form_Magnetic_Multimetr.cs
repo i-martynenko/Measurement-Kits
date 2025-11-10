@@ -343,6 +343,32 @@ namespace Measurement_Kits
             GlobalExitHelper.SwitchTo(this, Form_Menu);
         }
 
+        private void button_Plot1Clear_Click(object sender, EventArgs e)
+        {
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot1.Plot.Remove(DataLoggerPlot1);
+            DataLoggerPlot1 = Plot1.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
+            DataLoggerPlot1.LineWidth = 0;
+            DataLoggerPlot1.MarkerSize = 10;
+            DataLoggerPlot1.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot1.ManageAxisLimits = true;
+            Plot1.Refresh();
+        }
+
+        private void button_Plot2Clear_Click(object sender, EventArgs e)
+        {
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot2.Plot.Remove(DataLoggerPlot2);
+            DataLoggerPlot2 = Plot2.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot2.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Blue);
+            DataLoggerPlot2.LineWidth = 0;
+            DataLoggerPlot2.MarkerSize = 10;
+            DataLoggerPlot2.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot2.ManageAxisLimits = true;
+            Plot2.Refresh();
+        }
+
         private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
         {
             string portName = comboBox1.Text;

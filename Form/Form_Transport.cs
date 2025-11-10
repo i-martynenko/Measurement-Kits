@@ -98,18 +98,26 @@ namespace Measurement_Kits
         }
         private void CreatCOM() 
         {
-            comboBox1.Items.Clear();
-            string[] ports = SerialPort.GetPortNames(); // Отримати список портів
-
-            comboBox1.Items.AddRange(ports);
-            comboBox2.Items.AddRange(ports);
-            if (ports.Length > 0) 
+            try
             {
-                comboBox1.SelectedIndex = 1; // вибрати перший порт
-                comboBox2.SelectedIndex = 2;
-            }                
-            else
-                comboBox1.Text = "Немає портів";
+                comboBox1.Items.Clear();
+                string[] ports = SerialPort.GetPortNames(); // Отримати список портів
+
+                comboBox1.Items.AddRange(ports);
+                comboBox2.Items.AddRange(ports);
+                if (ports.Length > 0)
+                {
+                    comboBox1.SelectedIndex = 1; // вибрати перший порт
+                    comboBox2.SelectedIndex = 2;
+                }
+                else
+                    comboBox1.Text = "Немає портів";
+            }
+            catch (Exception)
+            {                
+                
+            }
+            
         }
 
         
@@ -185,7 +193,7 @@ namespace Measurement_Kits
                     _cts = new CancellationTokenSource();
                     _isRunning = true;
                     button3.Text = "Pause";                    
-                    await Task.Run(() => MeasurementLoop(_cts.Token, checkBox_Write.Checked));
+                    await Task.Run(() => MeasurementLoop(_cts.Token,check_channel_A.Checked, check_channel_B.Checked, checkBox_Get_K.Checked, checkBox_Get_Sensor.Checked, checkBox_Wtite_time_in_file.Checked));
                 }
                 else
                 {
@@ -206,10 +214,14 @@ namespace Measurement_Kits
             }
 
         }
-        private async Task MeasurementLoop(CancellationToken token, bool read_time = false)
+        private async Task MeasurementLoop(CancellationToken token, bool channel_A,bool channel_B,bool Get_K,bool Get_Sensor,bool read_time = false)
         {
             string filePath = label_path.Text;
-
+            string name_channel = "A";
+            if (channel_B)
+            {
+                name_channel = "B";
+            }
             // якщо файл новий – додаємо заголовки
             if (!File.Exists(filePath))
             {
@@ -244,18 +256,29 @@ namespace Measurement_Kits
 
                     //  зчитування даних з приладів
                     double resistance = _keithley.Get_FETCh();
-                    double temperature = _lakeshore.GetTemperature_K();
+                    double temperature = 0;
+                    if (Get_K) 
+                    {
+                        temperature = _lakeshore.GetTemperature_K(name_channel);
+
+                    }
+                    if (Get_Sensor)
+                    {
+                        temperature = _lakeshore.GetSensor(name_channel);
+                    }
+                    
                     AddTemperature(temperature);
                     // Запис у файл
                     //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
                     string line;
                     if (read_time)
                     {
-                        line = $"{temperature:E8}\t{resistance:E8}\r\n";                        
+                        line = $"{time}\t{temperature:E8}\t{resistance:E8}\r\n";
+                                  
                     }
                     else
                     {
-                        line = $"{time}\t{temperature:E8}\t{resistance:E8}\r\n";
+                        line = $"{temperature:E8}\t{resistance:E8}\r\n";
                     }                    
 
                     File.AppendAllText(filePath, line);                    
@@ -297,93 +320,7 @@ namespace Measurement_Kits
             }
 
         }
-        /*
-        private async Task MeasurementLoop_LastVersion(CancellationToken token,bool read_time = false)
-        {
-            string filePath = label_path.Text;
-
-            // якщо файл новий – додаємо заголовки
-            if (!File.Exists(filePath)) 
-            {
-                if (read_time)
-                {
-                    File.AppendAllText(filePath, "Resistance\tTemperature\n");
-                }
-                else
-                {
-                    File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-                }
-            }
-                //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-                File.AppendAllText(filePath, "Resistance\tTemperature\n");
-
-            while (!token.IsCancellationRequested)
-            {
-                var time = DateTime.Now.ToString("HH:mm:ss.fff");
-
-                //  зчитування даних з приладів
-                double resistance = _keithley.MeasureResistance(measureCounter);
-                double temperature = _lakeshore.MeasureTemperature(measureCounter);
-                AddTemperature(temperature);
-                // Запис у файл
-                //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
-                string line;
-                if (read_time)
-                {
-                    line = $"{resistance:E8}\t{temperature:E8}\n";
-                }
-                else
-                {
-                    line = $"{time}\t{resistance:E8}\t{temperature:E8}\n";
-                }
-                
-                File.AppendAllText(filePath, line);
-
-                /// Speed Temp
-                measureCounter++;
-                //List_Temperature.Add(temperature);
-                //List_Resistance.Add(resistance);
-                //List_Index.Add(measureCounter);
-                if (measureCounter % 3 == 0) // кожні 3 цикли
-                {
-                    double TempSpeed = 0;
-                    if (tempHistory.Count >= 2)
-                    {
-                        var first = tempHistory.Peek();
-                        var last = tempHistory.Last();
-                        double deltaT = last.Temp - first.Temp;
-                        double deltaTime = (last.Time - first.Time).TotalSeconds;
-                        TempSpeed = (deltaT / deltaTime) * 60.0; // K/min
-                    }
-
-                    // Оновлюємо label у GUI-потоці
-                    this.Invoke(new Action(() =>
-                    {
-                        label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f2} K/min";
-                    }));
-
-                }
-                // Оновлення графіка на формі
-                this.Invoke(new Action(() =>
-                {
-
-                    // formsPlot1.Plot.AddPoint(resistance, temperature); // приклад, можна 2 графіки
-                    // formsPlot1.Refresh();
-                    // scatterPlot1.
-                    //scatterPlot1.Add(temperature, resistance);
-                    DataLoggerPlot1.Add(temperature, resistance);
-                    DataLoggerPlot2.Add(measureCounter, temperature);
-                    Plot1.Refresh();
-                    Plot2.Refresh();
-
-                    //scatterPlot2.Add(measureCounter, temperature);
-                    //Plot2.Refresh();
-                }));
-
-                await Task.Delay(_timeStepMs, token);
-            }
-        }
-        */
+       
         private void AddTemperature(double temp)
         {
             var now = DateTime.Now;
@@ -442,6 +379,37 @@ namespace Measurement_Kits
             }
         }
 
+        
+
+        
+
+        private void button_Plot1Clear_Click(object sender, EventArgs e)
+        {
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot1.Plot.Remove(DataLoggerPlot1);
+            DataLoggerPlot1 = Plot1.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
+            DataLoggerPlot1.LineWidth = 0;
+            DataLoggerPlot1.MarkerSize = 10;
+            DataLoggerPlot1.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot1.ManageAxisLimits = true;
+            Plot1.Refresh();
+        }
+
+        private void button_Plot2Clear_Click(object sender, EventArgs e)
+        {
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot2.Plot.Remove(DataLoggerPlot2);
+            DataLoggerPlot2 = Plot2.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot2.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Blue);
+            DataLoggerPlot2.LineWidth = 0;
+            DataLoggerPlot2.MarkerSize = 10;
+            DataLoggerPlot2.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot2.ManageAxisLimits = true;
+            Plot2.Refresh();
+        }
+        
+
         private void button_Plot1Scale_Click(object sender, EventArgs e)
         {
             DataLoggerPlot1.ManageAxisLimits = !DataLoggerPlot1.ManageAxisLimits;
@@ -470,6 +438,34 @@ namespace Measurement_Kits
             }
         }
 
-        
+        private void checkBox_Get_K_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_Get_K.Checked)
+            {
+                checkBox_Get_Sensor.Checked = false;
+            }
+
+        }
+
+        private void checkBox_Get_Sensor_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_Get_Sensor.Checked)
+            {
+                checkBox_Get_K.Checked = false;
+            }
+        }
+
+        private void check_channel_A_CheckedChanged(object sender, EventArgs e)
+        {
+            if (check_channel_A.Checked)
+                check_channel_B.Checked = false;
+        }
+        private void check_channel_B_CheckedChanged(object sender, EventArgs e)
+        {
+            if (check_channel_B.Checked)
+                check_channel_A.Checked = false;
+        }
+
+
     }
 }

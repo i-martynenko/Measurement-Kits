@@ -34,5 +34,11 @@ namespace Measurement_Kits
             string resp = SendCommand($"KRDG? {channel}",wait);
             return resp != null ? (double)ParseResponse2(resp) : double.NaN;    
         }
+        public double GetSensor(string channel = "A", int wait = 50)
+        {
+
+            string resp = SendCommand($"SRDG? {channel}", wait);
+            return resp != null ? (double)ParseResponse2(resp) : double.NaN;
+        }
     }
 }
