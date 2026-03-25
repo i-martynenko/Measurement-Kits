@@ -64,7 +64,7 @@ namespace Measurement_Kits
 
             comboBox1.Items.AddRange(ports);
             comboBox2.Items.AddRange(ports);
-            if (ports.Length > 0)
+            if (ports.Length > 1)
             {
                 comboBox1.SelectedIndex = 1; // вибрати перший порт
                 comboBox2.SelectedIndex = 0;

@@ -32,12 +32,19 @@ namespace Measurement_Kits
             this.components = new System.ComponentModel.Container();
             this.button_Menu = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.button_Plot1Clear = new System.Windows.Forms.Button();
             this.label_Plot1_Coordinate = new System.Windows.Forms.Label();
             this.button_Plot1Scale = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.button_Plot2Clear = new System.Windows.Forms.Button();
             this.label_Plot2_Coordinate = new System.Windows.Forms.Label();
             this.button_Plot2Scale = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.checkBox_Wtite_time_in_file = new System.Windows.Forms.CheckBox();
+            this.checkBox_Get_Sensor = new System.Windows.Forms.CheckBox();
+            this.checkBox_Get_K = new System.Windows.Forms.CheckBox();
+            this.check_channel_B = new System.Windows.Forms.CheckBox();
+            this.check_channel_A = new System.Windows.Forms.CheckBox();
             this.label_TempNow = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -51,13 +58,7 @@ namespace Measurement_Kits
             this.label1 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.check_channel_A = new System.Windows.Forms.CheckBox();
-            this.check_channel_B = new System.Windows.Forms.CheckBox();
-            this.checkBox_Get_K = new System.Windows.Forms.CheckBox();
-            this.checkBox_Get_Sensor = new System.Windows.Forms.CheckBox();
-            this.checkBox_Wtite_time_in_file = new System.Windows.Forms.CheckBox();
-            this.button_Plot1Clear = new System.Windows.Forms.Button();
-            this.button_Plot2Clear = new System.Windows.Forms.Button();
+            this.checkBox_LockIn = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -86,6 +87,17 @@ namespace Measurement_Kits
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(945, 528);
             this.panel1.TabIndex = 1;
+            // 
+            // button_Plot1Clear
+            // 
+            this.button_Plot1Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Plot1Clear.Location = new System.Drawing.Point(857, 44);
+            this.button_Plot1Clear.Name = "button_Plot1Clear";
+            this.button_Plot1Clear.Size = new System.Drawing.Size(75, 23);
+            this.button_Plot1Clear.TabIndex = 2;
+            this.button_Plot1Clear.Text = "Clr";
+            this.button_Plot1Clear.UseVisualStyleBackColor = true;
+            this.button_Plot1Clear.Click += new System.EventHandler(this.button_Plot1Clear_Click);
             // 
             // label_Plot1_Coordinate
             // 
@@ -119,6 +131,17 @@ namespace Measurement_Kits
             this.panel2.Size = new System.Drawing.Size(945, 222);
             this.panel2.TabIndex = 2;
             // 
+            // button_Plot2Clear
+            // 
+            this.button_Plot2Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Plot2Clear.Location = new System.Drawing.Point(857, 44);
+            this.button_Plot2Clear.Name = "button_Plot2Clear";
+            this.button_Plot2Clear.Size = new System.Drawing.Size(75, 23);
+            this.button_Plot2Clear.TabIndex = 3;
+            this.button_Plot2Clear.Text = "Clr";
+            this.button_Plot2Clear.UseVisualStyleBackColor = true;
+            this.button_Plot2Clear.Click += new System.EventHandler(this.button_Plot2Clear_Click);
+            // 
             // label_Plot2_Coordinate
             // 
             this.label_Plot2_Coordinate.AutoSize = true;
@@ -143,6 +166,7 @@ namespace Measurement_Kits
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel3.Controls.Add(this.checkBox_LockIn);
             this.panel3.Controls.Add(this.checkBox_Wtite_time_in_file);
             this.panel3.Controls.Add(this.checkBox_Get_Sensor);
             this.panel3.Controls.Add(this.checkBox_Get_K);
@@ -164,6 +188,60 @@ namespace Measurement_Kits
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(238, 744);
             this.panel3.TabIndex = 3;
+            // 
+            // checkBox_Wtite_time_in_file
+            // 
+            this.checkBox_Wtite_time_in_file.AutoSize = true;
+            this.checkBox_Wtite_time_in_file.Location = new System.Drawing.Point(16, 289);
+            this.checkBox_Wtite_time_in_file.Name = "checkBox_Wtite_time_in_file";
+            this.checkBox_Wtite_time_in_file.Size = new System.Drawing.Size(100, 17);
+            this.checkBox_Wtite_time_in_file.TabIndex = 17;
+            this.checkBox_Wtite_time_in_file.Text = "Wtite time in file";
+            this.checkBox_Wtite_time_in_file.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_Get_Sensor
+            // 
+            this.checkBox_Get_Sensor.AutoSize = true;
+            this.checkBox_Get_Sensor.Location = new System.Drawing.Point(16, 266);
+            this.checkBox_Get_Sensor.Name = "checkBox_Get_Sensor";
+            this.checkBox_Get_Sensor.Size = new System.Drawing.Size(79, 17);
+            this.checkBox_Get_Sensor.TabIndex = 16;
+            this.checkBox_Get_Sensor.Text = "Get Sensor";
+            this.checkBox_Get_Sensor.UseVisualStyleBackColor = true;
+            this.checkBox_Get_Sensor.CheckedChanged += new System.EventHandler(this.checkBox_Get_Sensor_CheckedChanged);
+            // 
+            // checkBox_Get_K
+            // 
+            this.checkBox_Get_K.AutoSize = true;
+            this.checkBox_Get_K.Location = new System.Drawing.Point(16, 243);
+            this.checkBox_Get_K.Name = "checkBox_Get_K";
+            this.checkBox_Get_K.Size = new System.Drawing.Size(75, 17);
+            this.checkBox_Get_K.TabIndex = 15;
+            this.checkBox_Get_K.Text = "Get Kelvin";
+            this.checkBox_Get_K.UseVisualStyleBackColor = true;
+            this.checkBox_Get_K.CheckedChanged += new System.EventHandler(this.checkBox_Get_K_CheckedChanged);
+            // 
+            // check_channel_B
+            // 
+            this.check_channel_B.AutoSize = true;
+            this.check_channel_B.Location = new System.Drawing.Point(16, 220);
+            this.check_channel_B.Name = "check_channel_B";
+            this.check_channel_B.Size = new System.Drawing.Size(75, 17);
+            this.check_channel_B.TabIndex = 14;
+            this.check_channel_B.Text = "Channel B";
+            this.check_channel_B.UseVisualStyleBackColor = true;
+            this.check_channel_B.CheckedChanged += new System.EventHandler(this.check_channel_B_CheckedChanged);
+            // 
+            // check_channel_A
+            // 
+            this.check_channel_A.AutoSize = true;
+            this.check_channel_A.Location = new System.Drawing.Point(16, 197);
+            this.check_channel_A.Name = "check_channel_A";
+            this.check_channel_A.Size = new System.Drawing.Size(75, 17);
+            this.check_channel_A.TabIndex = 13;
+            this.check_channel_A.Text = "Channel A";
+            this.check_channel_A.UseVisualStyleBackColor = true;
+            this.check_channel_A.CheckedChanged += new System.EventHandler(this.check_channel_A_CheckedChanged);
             // 
             // label_TempNow
             // 
@@ -284,81 +362,16 @@ namespace Measurement_Kits
             this.label1.TabIndex = 1;
             this.label1.Text = "Multimetr";
             // 
-            // check_channel_A
+            // checkBox_LockIn
             // 
-            this.check_channel_A.AutoSize = true;
-            this.check_channel_A.Location = new System.Drawing.Point(16, 197);
-            this.check_channel_A.Name = "check_channel_A";
-            this.check_channel_A.Size = new System.Drawing.Size(75, 17);
-            this.check_channel_A.TabIndex = 13;
-            this.check_channel_A.Text = "Channel A";
-            this.check_channel_A.UseVisualStyleBackColor = true;
-            this.check_channel_A.CheckedChanged += new System.EventHandler(this.check_channel_A_CheckedChanged);
-            // 
-            // check_channel_B
-            // 
-            this.check_channel_B.AutoSize = true;
-            this.check_channel_B.Location = new System.Drawing.Point(16, 220);
-            this.check_channel_B.Name = "check_channel_B";
-            this.check_channel_B.Size = new System.Drawing.Size(75, 17);
-            this.check_channel_B.TabIndex = 14;
-            this.check_channel_B.Text = "Channel B";
-            this.check_channel_B.UseVisualStyleBackColor = true;
-            this.check_channel_B.CheckedChanged += new System.EventHandler(this.check_channel_B_CheckedChanged);
-            // 
-            // checkBox_Get_K
-            // 
-            this.checkBox_Get_K.AutoSize = true;
-            this.checkBox_Get_K.Location = new System.Drawing.Point(16, 243);
-            this.checkBox_Get_K.Name = "checkBox_Get_K";
-            this.checkBox_Get_K.Size = new System.Drawing.Size(75, 17);
-            this.checkBox_Get_K.TabIndex = 15;
-            this.checkBox_Get_K.Text = "Get Kelvin";
-            this.checkBox_Get_K.UseVisualStyleBackColor = true;
-            this.checkBox_Get_K.CheckedChanged += new System.EventHandler(this.checkBox_Get_K_CheckedChanged);
-            // 
-            // checkBox_Get_Sensor
-            // 
-            this.checkBox_Get_Sensor.AutoSize = true;
-            this.checkBox_Get_Sensor.Location = new System.Drawing.Point(16, 266);
-            this.checkBox_Get_Sensor.Name = "checkBox_Get_Sensor";
-            this.checkBox_Get_Sensor.Size = new System.Drawing.Size(79, 17);
-            this.checkBox_Get_Sensor.TabIndex = 16;
-            this.checkBox_Get_Sensor.Text = "Get Sensor";
-            this.checkBox_Get_Sensor.UseVisualStyleBackColor = true;
-            this.checkBox_Get_Sensor.CheckedChanged += new System.EventHandler(this.checkBox_Get_Sensor_CheckedChanged);
-            // 
-            // checkBox_Wtite_time_in_file
-            // 
-            this.checkBox_Wtite_time_in_file.AutoSize = true;
-            this.checkBox_Wtite_time_in_file.Location = new System.Drawing.Point(16, 289);
-            this.checkBox_Wtite_time_in_file.Name = "checkBox_Wtite_time_in_file";
-            this.checkBox_Wtite_time_in_file.Size = new System.Drawing.Size(100, 17);
-            this.checkBox_Wtite_time_in_file.TabIndex = 17;
-            this.checkBox_Wtite_time_in_file.Text = "Wtite time in file";
-            this.checkBox_Wtite_time_in_file.UseVisualStyleBackColor = true;
-            // 
-            // button_Plot1Clear
-            // 
-            this.button_Plot1Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_Plot1Clear.Location = new System.Drawing.Point(857, 44);
-            this.button_Plot1Clear.Name = "button_Plot1Clear";
-            this.button_Plot1Clear.Size = new System.Drawing.Size(75, 23);
-            this.button_Plot1Clear.TabIndex = 2;
-            this.button_Plot1Clear.Text = "Clr";
-            this.button_Plot1Clear.UseVisualStyleBackColor = true;
-            this.button_Plot1Clear.Click += new System.EventHandler(this.button_Plot1Clear_Click);
-            // 
-            // button_Plot2Clear
-            // 
-            this.button_Plot2Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_Plot2Clear.Location = new System.Drawing.Point(857, 44);
-            this.button_Plot2Clear.Name = "button_Plot2Clear";
-            this.button_Plot2Clear.Size = new System.Drawing.Size(75, 23);
-            this.button_Plot2Clear.TabIndex = 3;
-            this.button_Plot2Clear.Text = "Clr";
-            this.button_Plot2Clear.UseVisualStyleBackColor = true;
-            this.button_Plot2Clear.Click += new System.EventHandler(this.button_Plot2Clear_Click);
+            this.checkBox_LockIn.AutoSize = true;
+            this.checkBox_LockIn.Location = new System.Drawing.Point(16, 176);
+            this.checkBox_LockIn.Name = "checkBox_LockIn";
+            this.checkBox_LockIn.Size = new System.Drawing.Size(62, 17);
+            this.checkBox_LockIn.TabIndex = 18;
+            this.checkBox_LockIn.Text = "Lock-In";
+            this.checkBox_LockIn.UseVisualStyleBackColor = true;
+            this.checkBox_LockIn.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // Form_Transport
             // 
@@ -413,5 +426,6 @@ namespace Measurement_Kits
         private System.Windows.Forms.CheckBox check_channel_A;
         private System.Windows.Forms.Button button_Plot1Clear;
         private System.Windows.Forms.Button button_Plot2Clear;
+        private System.Windows.Forms.CheckBox checkBox_LockIn;
     }
 }

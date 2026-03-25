@@ -22,6 +22,7 @@ namespace Measurement_Kits
         private List<double> List_Resistance = new List<double>();        
         private Keithley2000 _keithley;
         private LakeShore335 _lakeshore;
+        private Lock_in_Amplifier_SR830 _lock_in_amplifier;
         private CancellationTokenSource _cts;
         private bool _isRunning = false;
         private int _timeStepMs; // інтервал у мс (можеш змінювати прямо з форми)
@@ -105,7 +106,7 @@ namespace Measurement_Kits
 
                 comboBox1.Items.AddRange(ports);
                 comboBox2.Items.AddRange(ports);
-                if (ports.Length > 0)
+                if (ports.Length > 1)
                 {
                     comboBox1.SelectedIndex = 1; // вибрати перший порт
                     comboBox2.SelectedIndex = 2;
@@ -145,17 +146,35 @@ namespace Measurement_Kits
         }
         private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
         {
-            string portName = comboBox1.Text;            
-            _keithley = new Keithley2000();
-            bool status = _keithley.Connect(portName);
-            if (status)
+            if (checkBox_LockIn.Checked)
             {
-                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
+                string portName = comboBox1.Text;
+                _lock_in_amplifier = new Lock_in_Amplifier_SR830();
+                bool status = _keithley.Connect(portName);
+                if (status)
+                {
+                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
+                }
+                else
+                {
+                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
+                }
             }
             else
             {
-                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
+                string portName = comboBox1.Text;
+                _keithley = new Keithley2000();
+                bool status = _keithley.Connect(portName);
+                if (status)
+                {
+                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
+                }
+                else
+                {
+                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
+                }
             }
+           
         }
         private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
         {
@@ -185,32 +204,182 @@ namespace Measurement_Kits
 
         private async void button3_Click(object sender, EventArgs e)
         {
-            try
+            if (checkBox_LockIn.Checked)
             {
-                if (!_isRunning)
+                try
                 {
-                    // Запуск
-                    _cts = new CancellationTokenSource();
-                    _isRunning = true;
-                    button3.Text = "Pause";                    
-                    await Task.Run(() => MeasurementLoop(_cts.Token,check_channel_A.Checked, check_channel_B.Checked, checkBox_Get_K.Checked, checkBox_Get_Sensor.Checked, checkBox_Wtite_time_in_file.Checked));
+                    if (!_isRunning)
+                    {
+                        // Запуск
+                        _cts = new CancellationTokenSource();
+                        _isRunning = true;
+                        button3.Text = "Pause";
+                        await Task.Run(() => MeasurementLoopWithLockIn(_cts.Token, check_channel_A.Checked, check_channel_B.Checked, checkBox_Get_K.Checked, checkBox_Get_Sensor.Checked, checkBox_Wtite_time_in_file.Checked));
+                    }
+                    else
+                    {
+                        // Пауза
+                        _cts.Cancel();
+                        _isRunning = false;
+                        button3.Text = "Start";
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    // Це нормальне завершення, нічого не робимо
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Помилка в циклі: {ex.Message}");
+                    var x = ex.Message;
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (!_isRunning)
+                    {
+                        // Запуск
+                        _cts = new CancellationTokenSource();
+                        _isRunning = true;
+                        button3.Text = "Pause";
+                        await Task.Run(() => MeasurementLoop(_cts.Token, check_channel_A.Checked, check_channel_B.Checked, checkBox_Get_K.Checked, checkBox_Get_Sensor.Checked, checkBox_Wtite_time_in_file.Checked));
+                    }
+                    else
+                    {
+                        // Пауза
+                        _cts.Cancel();
+                        _isRunning = false;
+                        button3.Text = "Start";
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    // Це нормальне завершення, нічого не робимо
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Помилка в циклі: {ex.Message}");
+                    var x = ex.Message;
+                }
+            }
+            
+
+        }
+        private async Task MeasurementLoopWithLockIn(CancellationToken token, bool channel_A, bool channel_B, bool Get_K, bool Get_Sensor, bool read_time = false)
+        {
+            string filePath = label_path.Text;
+            string name_channel = "A";
+            if (channel_B)
+            {
+                name_channel = "B";
+            }
+            // якщо файл новий – додаємо заголовки
+            if (!File.Exists(filePath))
+            {
+
+            }
+            File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
+            
+            double freq = _lock_in_amplifier.GetFrequency();
+            double phase = _lock_in_amplifier.GetPhase();
+            double ampl = _lock_in_amplifier.GetAmplitude();
+
+            File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
+
+            //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
+            if (read_time)
+            {
+                File.AppendAllText(filePath, "Time\tTemperature\tChanel1\tChanel2\r\n");
+            }
+            else
+            {
+                File.AppendAllText(filePath, "Temperature\tChanel1\tChanel2\r\n");
+            }
+
+
+            var sw = new Stopwatch();
+            sw.Start();
+            long lastTick = sw.ElapsedTicks;
+            //_keithley.Set_INIT_COUNT_ON();
+
+            while (!token.IsCancellationRequested)
+            {
+                // Обчислюємо час, який пройшов
+                long currentTick = sw.ElapsedMilliseconds;
+                double elapsedMicroSec = (long)(currentTick - lastTick);
+
+                if (elapsedMicroSec >= _timeStepMs) // наприклад, 50 мкс
+                {
+                    lastTick += _timeStepMs;
+                    var time = DateTime.Now.ToString("HH:mm:ss.fff");
+
+                    //  зчитування даних з приладів
+                    //double resistance = _keithley.Get_FETCh();
+                    double chanel1 = _lock_in_amplifier.GetDisplayChannel_1();
+                    double chanel2 = _lock_in_amplifier.GetDisplayChannel_2();
+                    double temperature = 0;
+                    if (Get_K)
+                    {
+                        temperature = _lakeshore.GetTemperature_K(name_channel);
+
+                    }
+                    if (Get_Sensor)
+                    {
+                        temperature = _lakeshore.GetSensor(name_channel);
+                    }
+
+                    AddTemperature(temperature);
+                    // Запис у файл
+                    //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
+                    string line;
+                    if (read_time)
+                    {
+                        line = $"{time}\t{temperature:E8}\t{chanel1:E8}\t{chanel2:E8}\r\n";
+
+                    }
+                    else
+                    {
+                        line = $"{temperature:E8}\t{chanel1:E8}\t{chanel2:E8}\r\n";
+                    }
+
+                    File.AppendAllText(filePath, line);
+                    measureCounter++;
+                    if (measureCounter % 3 == 0) // кожні 3 цикли
+                    {
+                        double TempSpeed = ComputeTemperatureSlope();
+                        // Оновлюємо label у GUI-потоці
+                        this.Invoke(new Action(() =>
+                        {
+                            label_TempNow.Text = $"P{temperature:f}K";
+                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f3} K/min";
+                        }));
+
+                    }
+                    // Оновлення графіка на формі
+                    this.Invoke(new Action(() =>
+                    {
+                        DataLoggerPlot1.Add(temperature, chanel1);
+                        DataLoggerPlot2.Add(measureCounter, temperature);
+                        Plot1.Refresh();
+                        Plot2.Refresh();
+                    }));
                 }
                 else
                 {
-                    // Пауза
-                    _cts.Cancel();
-                    _isRunning = false;
-                    button3.Text = "Start";
+                    int delay = (int)(_timeStepMs - elapsedMicroSec);
+                    if (delay > 1)
+                    {
+                        await Task.Delay(delay);
+                    }
+                    else
+                    {
+                        await Task.Yield();
+                    }
                 }
-            }
-            catch (TaskCanceledException)
-            {
-                // Це нормальне завершення, нічого не робимо
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Помилка в циклі: {ex.Message}");
-                var x = ex.Message;                
+                // Коротка пауза, щоб не “з’їдати” CPU
+                await Task.Yield();
             }
 
         }
@@ -452,6 +621,18 @@ namespace Measurement_Kits
             if (checkBox_Get_Sensor.Checked)
             {
                 checkBox_Get_K.Checked = false;
+            }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_LockIn.Checked)
+            {
+                label1.Text = "Lock-in";
+            }
+            else
+            {
+                label1.Text = "Multimetr";                
             }
         }
 
