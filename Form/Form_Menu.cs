@@ -49,5 +49,11 @@ namespace Measurement_Kits
             var form_Magnetic_Multi = new Form_Magnetic_Multimetr(this);
             GlobalExitHelper.SwitchTo(this, form_Magnetic_Multi, hideInsteadOfClose: true);
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var form_CalibrationTermoByLakeShore = new Form_CalibrationTermoByLakeShore(this);
+            GlobalExitHelper.SwitchTo(this, form_CalibrationTermoByLakeShore, hideInsteadOfClose: true);
+        }
     }
     }

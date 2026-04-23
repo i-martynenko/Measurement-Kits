@@ -1,7 +1,7 @@
 ﻿
 namespace Measurement_Kits
 {
-    partial class Form_Magnetic_Multimetr
+    partial class Form_CalibrationTermoByLakeShore
     {
         /// <summary>
         /// Required designer variable.
@@ -41,24 +41,18 @@ namespace Measurement_Kits
             this.button_Plot2Scale = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
             this.checkBox_Wtite_time_in_file = new System.Windows.Forms.CheckBox();
-            this.checkBox_Get_Sensor = new System.Windows.Forms.CheckBox();
-            this.checkBox_Get_K = new System.Windows.Forms.CheckBox();
             this.check_channel_B = new System.Windows.Forms.CheckBox();
             this.check_channel_A = new System.Windows.Forms.CheckBox();
             this.label_TempNow = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label_TempSpeed = new System.Windows.Forms.Label();
             this.label_path = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.button_ConnectToLakeShore = new System.Windows.Forms.Button();
-            this.button_ConnectToMultimetr = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.checkBox_LockIn = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -166,23 +160,17 @@ namespace Measurement_Kits
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel3.Controls.Add(this.checkBox_LockIn);
             this.panel3.Controls.Add(this.checkBox_Wtite_time_in_file);
-            this.panel3.Controls.Add(this.checkBox_Get_Sensor);
-            this.panel3.Controls.Add(this.checkBox_Get_K);
             this.panel3.Controls.Add(this.check_channel_B);
             this.panel3.Controls.Add(this.check_channel_A);
             this.panel3.Controls.Add(this.label_TempNow);
             this.panel3.Controls.Add(this.comboBox2);
-            this.panel3.Controls.Add(this.comboBox1);
             this.panel3.Controls.Add(this.label_TempSpeed);
             this.panel3.Controls.Add(this.label_path);
             this.panel3.Controls.Add(this.label2);
             this.panel3.Controls.Add(this.button3);
             this.panel3.Controls.Add(this.numericUpDown1);
             this.panel3.Controls.Add(this.button_ConnectToLakeShore);
-            this.panel3.Controls.Add(this.button_ConnectToMultimetr);
-            this.panel3.Controls.Add(this.label1);
             this.panel3.Controls.Add(this.button_Menu);
             this.panel3.Location = new System.Drawing.Point(960, 3);
             this.panel3.Name = "panel3";
@@ -192,43 +180,21 @@ namespace Measurement_Kits
             // checkBox_Wtite_time_in_file
             // 
             this.checkBox_Wtite_time_in_file.AutoSize = true;
-            this.checkBox_Wtite_time_in_file.Location = new System.Drawing.Point(16, 289);
+            this.checkBox_Wtite_time_in_file.Location = new System.Drawing.Point(16, 243);
             this.checkBox_Wtite_time_in_file.Name = "checkBox_Wtite_time_in_file";
             this.checkBox_Wtite_time_in_file.Size = new System.Drawing.Size(100, 17);
             this.checkBox_Wtite_time_in_file.TabIndex = 17;
             this.checkBox_Wtite_time_in_file.Text = "Wtite time in file";
             this.checkBox_Wtite_time_in_file.UseVisualStyleBackColor = true;
             // 
-            // checkBox_Get_Sensor
-            // 
-            this.checkBox_Get_Sensor.AutoSize = true;
-            this.checkBox_Get_Sensor.Location = new System.Drawing.Point(16, 266);
-            this.checkBox_Get_Sensor.Name = "checkBox_Get_Sensor";
-            this.checkBox_Get_Sensor.Size = new System.Drawing.Size(79, 17);
-            this.checkBox_Get_Sensor.TabIndex = 16;
-            this.checkBox_Get_Sensor.Text = "Get Sensor";
-            this.checkBox_Get_Sensor.UseVisualStyleBackColor = true;
-            this.checkBox_Get_Sensor.CheckedChanged += new System.EventHandler(this.checkBox_Get_Sensor_CheckedChanged);
-            // 
-            // checkBox_Get_K
-            // 
-            this.checkBox_Get_K.AutoSize = true;
-            this.checkBox_Get_K.Location = new System.Drawing.Point(16, 243);
-            this.checkBox_Get_K.Name = "checkBox_Get_K";
-            this.checkBox_Get_K.Size = new System.Drawing.Size(75, 17);
-            this.checkBox_Get_K.TabIndex = 15;
-            this.checkBox_Get_K.Text = "Get Kelvin";
-            this.checkBox_Get_K.UseVisualStyleBackColor = true;
-            this.checkBox_Get_K.CheckedChanged += new System.EventHandler(this.checkBox_Get_K_CheckedChanged);
-            // 
             // check_channel_B
             // 
             this.check_channel_B.AutoSize = true;
             this.check_channel_B.Location = new System.Drawing.Point(16, 220);
             this.check_channel_B.Name = "check_channel_B";
-            this.check_channel_B.Size = new System.Drawing.Size(75, 17);
+            this.check_channel_B.Size = new System.Drawing.Size(163, 17);
             this.check_channel_B.TabIndex = 14;
-            this.check_channel_B.Text = "Channel B";
+            this.check_channel_B.Text = "Channel B True-K False-Ohm";
             this.check_channel_B.UseVisualStyleBackColor = true;
             this.check_channel_B.CheckedChanged += new System.EventHandler(this.check_channel_B_CheckedChanged);
             // 
@@ -237,9 +203,9 @@ namespace Measurement_Kits
             this.check_channel_A.AutoSize = true;
             this.check_channel_A.Location = new System.Drawing.Point(16, 197);
             this.check_channel_A.Name = "check_channel_A";
-            this.check_channel_A.Size = new System.Drawing.Size(75, 17);
+            this.check_channel_A.Size = new System.Drawing.Size(163, 17);
             this.check_channel_A.TabIndex = 13;
-            this.check_channel_A.Text = "Channel A";
+            this.check_channel_A.Text = "Channel A True-K False-Ohm";
             this.check_channel_A.UseVisualStyleBackColor = true;
             this.check_channel_A.CheckedChanged += new System.EventHandler(this.check_channel_A_CheckedChanged);
             // 
@@ -260,14 +226,6 @@ namespace Measurement_Kits
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 21);
             this.comboBox2.TabIndex = 9;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(16, 55);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 8;
             // 
             // label_TempSpeed
             // 
@@ -343,37 +301,7 @@ namespace Measurement_Kits
             this.button_ConnectToLakeShore.UseVisualStyleBackColor = false;
             this.button_ConnectToLakeShore.Click += new System.EventHandler(this.button_ConnectToLakeShore_Click);
             // 
-            // button_ConnectToMultimetr
-            // 
-            this.button_ConnectToMultimetr.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.button_ConnectToMultimetr.Location = new System.Drawing.Point(154, 53);
-            this.button_ConnectToMultimetr.Name = "button_ConnectToMultimetr";
-            this.button_ConnectToMultimetr.Size = new System.Drawing.Size(24, 23);
-            this.button_ConnectToMultimetr.TabIndex = 2;
-            this.button_ConnectToMultimetr.UseVisualStyleBackColor = false;
-            this.button_ConnectToMultimetr.Click += new System.EventHandler(this.button_ConnectToMultimetr_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 39);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Multimetr";
-            // 
-            // checkBox_LockIn
-            // 
-            this.checkBox_LockIn.AutoSize = true;
-            this.checkBox_LockIn.Location = new System.Drawing.Point(16, 176);
-            this.checkBox_LockIn.Name = "checkBox_LockIn";
-            this.checkBox_LockIn.Size = new System.Drawing.Size(62, 17);
-            this.checkBox_LockIn.TabIndex = 18;
-            this.checkBox_LockIn.Text = "Lock-In";
-            this.checkBox_LockIn.UseVisualStyleBackColor = true;
-            this.checkBox_LockIn.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // Form_Transport
+            // Form_CalibrationTermoByLakeShore
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -381,10 +309,10 @@ namespace Measurement_Kits
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.Name = "Form_Transport";
+            this.Name = "Form_CalibrationTermoByLakeShore";
             this.Text = "Transport";
-            this.Load += new System.EventHandler(this.Transport_Load);
-            this.SizeChanged += new System.EventHandler(this.Form_Transport_SizeChanged);
+            this.Load += new System.EventHandler(this.CalibrationTermoByLakeShore_Load);
+            this.SizeChanged += new System.EventHandler(this.Form_CalibrationTermoByLakeShore_SizeChanged);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -405,27 +333,21 @@ namespace Measurement_Kits
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button button_ConnectToLakeShore;
-        private System.Windows.Forms.Button button_ConnectToMultimetr;
-        private System.Windows.Forms.Label label1;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label label_TempSpeed;
         private System.Windows.Forms.Label label_path;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Button button_Plot1Scale;
         private System.Windows.Forms.Button button_Plot2Scale;
         private System.Windows.Forms.Label label_Plot1_Coordinate;
         private System.Windows.Forms.Label label_Plot2_Coordinate;
         private System.Windows.Forms.Label label_TempNow;
         private System.Windows.Forms.CheckBox checkBox_Wtite_time_in_file;
-        private System.Windows.Forms.CheckBox checkBox_Get_Sensor;
-        private System.Windows.Forms.CheckBox checkBox_Get_K;
         private System.Windows.Forms.CheckBox check_channel_B;
         private System.Windows.Forms.CheckBox check_channel_A;
         private System.Windows.Forms.Button button_Plot1Clear;
         private System.Windows.Forms.Button button_Plot2Clear;
-        private System.Windows.Forms.CheckBox checkBox_LockIn;
     }
 }
