@@ -55,5 +55,11 @@ namespace Measurement_Kits
             var form_CalibrationTermoByLakeShore = new Form_CalibrationTermoByLakeShore(this);
             GlobalExitHelper.SwitchTo(this, form_CalibrationTermoByLakeShore, hideInsteadOfClose: true);
         }
-    }
+
+		private void button4_Click(object sender, EventArgs e)
+		{			
+			var form_Magnit = new Magnit(this);
+			GlobalExitHelper.SwitchTo(this, form_Magnit, hideInsteadOfClose: true);
+		}
+	}
     }
