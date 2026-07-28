@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Measurement_Kits.Device_dll;
+using ScottPlot;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,12 +9,11 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Measurement_Kits.Device_dll;
-using ScottPlot;
 
 namespace Measurement_Kits
 {
@@ -22,7 +23,8 @@ namespace Measurement_Kits
 		
 		private Danfysik9100 _magnet;
 		private Lock_in_Amplifier_SR830 _lock_in_amplifier;
-		private CancellationTokenSource _cts;
+        private Keithley2000 _keithley2000 ;
+        private CancellationTokenSource _cts;
 		private bool _isRunning = false;
 		private int _timeStepMs; // інтервал у мс (можеш змінювати прямо з форми)
 		private Queue<(DateTime Time, double Temp)> tempHistory = new Queue<(DateTime, double)>();
@@ -219,8 +221,19 @@ namespace Measurement_Kits
 		private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
 		{
 			string portName = comboBox1.Text;
-			_lock_in_amplifier = new Lock_in_Amplifier_SR830();
-			bool status = _lock_in_amplifier.Connect(portName);
+			bool status = false;
+
+            if (checkBox_Lock_in_Multimeter.Checked)
+			{
+                _lock_in_amplifier = new Lock_in_Amplifier_SR830();
+                status = _lock_in_amplifier.Connect(portName);
+            }
+			else
+			{
+				_keithley2000 = new Keithley2000();
+				status = _keithley2000.Connect(portName);
+            }
+
 			if (status)
 			{
 				button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
@@ -238,25 +251,43 @@ namespace Measurement_Kits
 			bool read_time = false)
 		{
 			string filePath = label_path.Text;
-			File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
-
-			double freq = _lock_in_amplifier.GetFrequency();
-			double phase = _lock_in_amplifier.GetPhase();
-			double ampl = _lock_in_amplifier.GetAmplitude();
-
-			File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
-			if (read_time)
+			if (checkBox_Lock_in_Multimeter.Checked) 
 			{
-				File.AppendAllText(filePath,
-					"Time\tMagnet\tChannel1\tChannel2\r\n");
+                File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
+
+                double freq = _lock_in_amplifier.GetFrequency();
+                double phase = _lock_in_amplifier.GetPhase();
+                double ampl = _lock_in_amplifier.GetAmplitude();
+
+                File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
+                if (read_time)
+                {
+                    File.AppendAllText(filePath,
+                        "Time\tMagnet\tChannel1\tChannel2\r\n");
+                }
+                else
+                {
+                    File.AppendAllText(filePath,
+                        "Magnet\tChannel1\tChannel2\r\n");
+                }
 			}
 			else
 			{
-				File.AppendAllText(filePath,
-					"Magnet\tChannel1\tChannel2\r\n");
-			}
-			
-			var sw = new Stopwatch();
+                
+                if (read_time)
+                {
+                    File.AppendAllText(filePath,
+                        "Time\tMagnet\tMultimeter\r\n");
+                }
+                else
+                {
+                    File.AppendAllText(filePath,
+                        "Magnet\tMultimeter\r\n");
+                }
+            }
+
+
+				var sw = new Stopwatch();
 			sw.Start();
 
 			long lastTick = sw.ElapsedMilliseconds;
@@ -309,36 +340,67 @@ namespace Measurement_Kits
 				}
 
 				string time = DateTime.Now.ToString("HH:mm:ss.fff");
-
-				double channel1 =
-					_lock_in_amplifier.GetDisplayChannel_1();
-
-				double channel2 =
-					_lock_in_amplifier.GetDisplayChannel_2();
-
-				//AddTemperature(magnet_now);
-
-				string line;
-
-				if (read_time)
+                string line;
+				double channel1 = 0;
+				double channel2 = 0;
+				double channel_Multimeter = 0;
+                if (checkBox_Lock_in_Multimeter.Checked)
 				{
-					line =
-						$"{time}\t{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
-				}
+                    channel1 = _lock_in_amplifier.GetDisplayChannel_1();
+
+                    channel2 = _lock_in_amplifier.GetDisplayChannel_2();
+                    //AddTemperature(magnet_now);
+                    
+
+                    if (read_time)
+                    {
+                        line =
+                            $"{time}\t{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                    }
+                    else
+                    {
+                        line =
+                            $"{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                    }
+                }
 				else
 				{
-					line =
-						$"{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
-				}
+					channel_Multimeter = _keithley2000.Get_FETCh();
+
+                    
+                    //AddTemperature(magnet_now);
+
+
+                    if (read_time)
+                    {
+                        line =
+                            $"{time}\t{magnet_now:E8}\t{channel_Multimeter:E8}\r\n";
+                    }
+                    else
+                    {
+                        line =
+                            $"{magnet_now:E8}\t{channel_Multimeter:E8}\r\n";
+                    }
+                }
+
 
 				File.AppendAllText(filePath, line);
 
 				this.Invoke(new Action(() =>
 				{
-					DataLoggerPlot1.Add(magnet_now, channel1);
-					DataLoggerPlot2.Add(magnet_now, channel2);
+					if (checkBox_Lock_in_Multimeter.Checked) 
+					{
+                        DataLoggerPlot1.Add(magnet_now, channel1);
+                        DataLoggerPlot2.Add(magnet_now, channel2);
+                    }
+					else
+					{
+						DataLoggerPlot1.Add(magnet_now, channel_Multimeter);
+                        //DataLoggerPlot2.Add(magnet_now, channel_Multimeter);
+                    }
 
-					Plot1.Refresh();
+
+                    Plot1.Refresh();
 					Plot2.Refresh();
 				}));
 
@@ -350,32 +412,46 @@ namespace Measurement_Kits
 		private async Task MeasurementLoop(CancellationToken token, double magnet_start, double magnet_delta, double magnet_end, bool read_time = false)
 		{
 			string filePath = label_path.Text;
-			
-			
-			// якщо файл новий – додаємо заголовки
-			if (!File.Exists(filePath))
-			{
-
-			}
-			File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
-
-			double freq = _lock_in_amplifier.GetFrequency();
-			double phase = _lock_in_amplifier.GetPhase();
-			double ampl = _lock_in_amplifier.GetAmplitude();
-
-			File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
-			//File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-			if (read_time)
-			{
-				File.AppendAllText(filePath, "Time\tMagnet\tChannel1\tChannel2\r\n");
-			}
-			else
-			{
-				File.AppendAllText(filePath, "Magnet\tChannel1\tChannel2\r\n");
-			}
 
 
-			var sw = new Stopwatch();
+            
+            if (checkBox_Lock_in_Multimeter.Checked)
+            {
+                File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
+
+                double freq = _lock_in_amplifier.GetFrequency();
+                double phase = _lock_in_amplifier.GetPhase();
+                double ampl = _lock_in_amplifier.GetAmplitude();
+
+                File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
+                if (read_time)
+                {
+                    File.AppendAllText(filePath,
+                        "Time\tMagnet\tChannel1\tChannel2\r\n");
+                }
+                else
+                {
+                    File.AppendAllText(filePath,
+                        "Magnet\tChannel1\tChannel2\r\n");
+                }
+            }
+            else
+            {
+
+                if (read_time)
+                {
+                    File.AppendAllText(filePath,
+                        "Time\tMagnet\tMultimeter\r\n");
+                }
+                else
+                {
+                    File.AppendAllText(filePath,
+                        "Magnet\tMultimeter\r\n");
+                }
+            }
+
+
+            var sw = new Stopwatch();
 			sw.Start();
 			long lastTick = sw.ElapsedTicks;
 			
@@ -393,26 +469,46 @@ namespace Measurement_Kits
 				{
 					lastTick += _timeStepMs;
 					var time = DateTime.Now.ToString("HH:mm:ss.fff");
-
-					//  зчитування даних з приладів
-					double channel1 = _lock_in_amplifier.GetDisplayChannel_1();
-					double channel2 = _lock_in_amplifier.GetDisplayChannel_2();
-					double temperature = 0;
+                    string line;
+                    double channel1 = 0;
+                    double channel2 = 0;
+                    double channel_Multimeter = 0;
 					
+                    if (checkBox_Lock_in_Multimeter.Checked)
+                    {
+                        channel1 = _lock_in_amplifier.GetDisplayChannel_1();
 
-					AddTemperature(magnet_now);
-					// Запис у файл
-					//string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
-					string line;
-					if (read_time)
-					{
-						line = $"{time}\t{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                        channel2 = _lock_in_amplifier.GetDisplayChannel_2();
+                        AddTemperature(magnet_now);
 
-					}
-					else
-					{
-						line = $"{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
-					}
+
+                        if (read_time)
+                        {
+                            line =
+                                $"{time}\t{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                        }
+                        else
+                        {
+                            line =
+                                $"{magnet_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+                        }
+                    }
+                    else
+                    {
+                        channel_Multimeter = _keithley2000.Get_FETCh();
+                        AddTemperature(magnet_now);
+                        if (read_time)
+                        {
+                            line =
+                                $"{time}\t{magnet_now:E8}\t{channel_Multimeter:E8}\r\n";
+                        }
+                        else
+                        {
+                            line =
+                                $"{magnet_now:E8}\t{channel_Multimeter:E8}\r\n";
+                        }
+                    }
+					
 
 					File.AppendAllText(filePath, line);
 					measureCounter++;
@@ -430,11 +526,21 @@ namespace Measurement_Kits
 					// Оновлення графіка на формі
 					this.Invoke(new Action(() =>
 					{
-						DataLoggerPlot1.Add(magnet_now, channel1);
-						DataLoggerPlot2.Add(magnet_now, channel2);
-						Plot1.Refresh();
-						Plot2.Refresh();
-					}));
+                        if (checkBox_Lock_in_Multimeter.Checked)
+                        {
+                            DataLoggerPlot1.Add(magnet_now, channel1);
+                            DataLoggerPlot2.Add(magnet_now, channel2);
+                        }
+                        else
+                        {
+                            DataLoggerPlot1.Add(magnet_now, channel_Multimeter);
+                            //DataLoggerPlot2.Add(magnet_now, channel_Multimeter);
+                        }
+
+
+                        Plot1.Refresh();
+                        Plot2.Refresh();
+                    }));
 				}
 				else
 				{
@@ -538,7 +644,19 @@ namespace Measurement_Kits
 			_magnet.SetMagneticField(Convert.ToDouble(textBox_SetMagne.Text));
 		}
 
-		public double ComputeTemperatureSlope()
+        private void checkBox_Lock_in_Multimeter_CheckedChanged(object sender, EventArgs e)
+        {
+			if (checkBox_Lock_in_Multimeter.Checked) 
+			{
+				label1.Text = "Lock-in Amplifier";
+            }
+			else
+			{
+                label1.Text = "Keithley2000";
+            }
+        }
+
+        public double ComputeTemperatureSlope()
 		{
 			if (tempHistory.Count < 2)
 				return 0;
