@@ -10,76 +10,122 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
-
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 namespace Measurement_Kits
 {
     public partial class Form_Magnetic_Multimetr : Form
     {
         private Form_Menu Form_Menu;
-        
-        private List<double> List_Index = new List<double>();
-        private List<double> List_Temperature = new List<double>();
-        private List<double> List_Resistance = new List<double>();        
         private Keithley2000 _keithley;
-        private LakeShore335 _lakeshore;
-        private Lock_in_Amplifier_SR830 _lock_in_amplifier;
+        private Lock_in_Amplifier_SR830 _lock_in_Amplifier_SR830;
         private CancellationTokenSource _cts;
         private bool _isRunning = false;
         private int _timeStepMs; // інтервал у мс (можеш змінювати прямо з форми)
         private Queue<(DateTime Time, double Temp)> tempHistory = new Queue<(DateTime, double)>();
         private int measureCounter = 0; // лічильник вимірів для середнього
+        //private Random _rnd = new Random();
+        private ScottPlot.WinForms.FormsPlot Plot1;
+        private ScottPlot.WinForms.FormsPlot Plot2;
+        private ScottPlot.WinForms.FormsPlot Plot3;
+
+        private ScottPlot.Plottables.DataStreamerXY DataLoggerPlot1;
+        private ScottPlot.Plottables.DataStreamerXY DataLoggerPlot2;
+        private ScottPlot.Plottables.DataStreamerXY DataLoggerPlot3;
         public Form_Magnetic_Multimetr(Form_Menu menu)
         {
             InitializeComponent();
             Form_Menu = menu;
             GlobalExitHelper.AttachGlobalExit(this);
-
         }
-        private Random _rnd = new Random();
-        private ScottPlot.WinForms.FormsPlot Plot1;
-        private ScottPlot.WinForms.FormsPlot Plot2;
-        
-        private ScottPlot.Plottables.DataStreamerXY DataLoggerPlot1;
-        private ScottPlot.Plottables.DataStreamerXY DataLoggerPlot2;
-        
+        private int Plot2Sizedifference_widht, Plot1Sizedifference_widht;
+        int Plot1Sizedifference_hight, Plot2Sizedifference_hight;
+        private void Form_Magnetic_Multimetr_SizeChanged(object sender, EventArgs e)
+        {
+            panel1.Height = this.Height - Plot1Sizedifference_hight;
+            //panel2.Height = this.Height - Plot2Sizedifference_hight;
+            panel1.Width = this.Width - Plot1Sizedifference_widht;
+            panel2.Width = this.Width - Plot2Sizedifference_widht;
+        }
+        private void Form_Magnetic_Multimetr_Load(object sender, EventArgs e)
+        {
+            _timeStepMs = (int)numericUpDown1.Value;
+            SetupPlots();
+            CreatCOM();
+            Plot1Sizedifference_widht = this.Size.Width - panel1.Width;
+            Plot2Sizedifference_widht = this.Size.Width - panel1.Width;
 
-        private void SetupPlots() 
+            Plot1Sizedifference_hight = this.Size.Height - panel1.Height;
+            Plot2Sizedifference_hight = this.Size.Height - panel2.Height;
+            Form_Magnetic_Multimetr_SizeChanged(null, null);
+        }
+        private void CreatCOM()
+        {
+            comboBox1.Items.Clear();
+            string[] ports = SerialPort.GetPortNames(); // Отримати список портів
+
+            comboBox1.Items.AddRange(ports);
+            comboBox2.Items.AddRange(ports);
+            if (ports.Length > 1)
+            {
+                comboBox1.SelectedIndex = 1; // вибрати перший порт
+                comboBox2.SelectedIndex = 0;
+            }
+            else
+                comboBox1.Text = "Немає портів";
+        }
+        private void SetupPlots()
         {
             Plot1 = new ScottPlot.WinForms.FormsPlot();
-            
             Plot1.Dock = DockStyle.Fill;
             panel1.Controls.Add(Plot1);
+
             Plot2 = new ScottPlot.WinForms.FormsPlot();
             Plot2.Dock = DockStyle.Fill;
             panel2.Controls.Add(Plot2);
+
+            Plot3 = new ScottPlot.WinForms.FormsPlot(); 
+            Plot3.Dock = DockStyle.Fill;
+            panel4.Controls.Add(Plot3);
             var x = Plot1.Plot;
 
-            DataLoggerPlot1 = Plot1.Plot.Add.DataStreamerXY(10000);            
+            DataLoggerPlot1 = Plot1.Plot.Add.DataStreamerXY(10000);
             Plot1.Plot.XLabel("T (K)");
-            Plot1.Plot.YLabel("R (Ω)");
-            
-            
+            Plot1.Plot.YLabel("Channel 1");
+
+
 
             DataLoggerPlot2 = Plot2.Plot.Add.DataStreamerXY(10000);
             Plot2.Plot.XLabel("Index");
             Plot2.Plot.YLabel("T (K)");
-           
-            
-            
-            
+
+            DataLoggerPlot3 = Plot3.Plot.Add.DataStreamerXY(10000);
+            Plot3.Plot.XLabel("Index");
+            Plot3.Plot.YLabel("Speed K");
+
+
             DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
             DataLoggerPlot2.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Blue);
+            DataLoggerPlot3.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Purple);
+
             DataLoggerPlot1.LineWidth = 0;
             DataLoggerPlot1.MarkerSize = 10;
             DataLoggerPlot1.MarkerShape = MarkerShape.FilledDiamond;
+
             DataLoggerPlot2.LineWidth = 0;
             DataLoggerPlot2.MarkerSize = 10;
             DataLoggerPlot2.MarkerShape = MarkerShape.FilledDiamond;
+
+            DataLoggerPlot3.LineWidth = 0;
+            DataLoggerPlot3.MarkerSize = 5;
+            DataLoggerPlot3.MarkerShape = MarkerShape.FilledDiamond;
+
             DataLoggerPlot1.ManageAxisLimits = true;
             DataLoggerPlot2.ManageAxisLimits = true;
+            DataLoggerPlot3.ManageAxisLimits = true;
 
             label_Plot1_Coordinate.Text = $"X={0}, Y={0}";
             label_Plot2_Coordinate.Text = $"X={0}, Y={0}";
+            label_Plot3_Coordinate.Text = $"X={0}, Y={0}";
             Plot1.MouseDown += (s, e) =>
             {
                 Pixel mousePixel = new Pixel(e.X, e.Y);
@@ -91,218 +137,58 @@ namespace Measurement_Kits
                 Pixel mousePixel = new Pixel(e.X, e.Y);
                 Coordinates mouseCoordinates = Plot2.Plot.GetCoordinates(mousePixel);
                 label_Plot2_Coordinate.Text = $"X={mouseCoordinates.X:N3}, Y={mouseCoordinates.Y:N3} (mouse down)";
-            };            
+            };
+            Plot3.MouseDown += (s, e) =>
+            {
+                Pixel mousePixel = new Pixel(e.X, e.Y);
+                Coordinates mouseCoordinates = Plot3.Plot.GetCoordinates(mousePixel);
+                label_Plot3_Coordinate.Text = $"X={mouseCoordinates.X:N3}, Y={mouseCoordinates.Y:N3} (mouse down)";
+            };
+
+
+
             button_Plot2Scale.Text = "AutoS";
             button_Plot2Scale.Text = "AutoS";
+            button_Plot3Scale.Text = "AutoS";
+
             Plot1.Refresh();
             Plot2.Refresh();
+            Plot3.Refresh();
         }
-        private void CreatCOM() 
+        private double ConvertT(double V)
         {
-            try
-            {
-                comboBox1.Items.Clear();
-                string[] ports = SerialPort.GetPortNames(); // Отримати список портів
-
-                comboBox1.Items.AddRange(ports);
-                comboBox2.Items.AddRange(ports);
-                if (ports.Length > 1)
-                {
-                    comboBox1.SelectedIndex = 1; // вибрати перший порт
-                    comboBox2.SelectedIndex = 2;
-                }
-                else
-                    comboBox1.Text = "Немає портів";
-            }
-            catch (Exception)
-            {                
-                
-            }
-            
+            return 77.57824 + 57550.8 * V - (7.23941E6) * V * V + (7.8661E8) * V * V * V - (3.478E10) * V * V * V * V;
         }
-
-        
-        private void Form_Transport_SizeChanged(object sender, EventArgs e)
-        {
-            panel1.Height = this.Height - Plot1Sizedifference_hight;
-            //panel2.Height = this.Height - Plot2Sizedifference_hight;
-            panel1.Width = this.Width - Plot1Sizedifference_widht;
-            panel2.Width = this.Width - Plot2Sizedifference_widht;
-        }
-        private int Plot2Sizedifference_widht, Plot1Sizedifference_widht;
-        int Plot1Sizedifference_hight, Plot2Sizedifference_hight;
-        private void Transport_Load(object sender, EventArgs e)
-        {
-            
-            _timeStepMs = (int) numericUpDown1.Value;
-            SetupPlots();
-            CreatCOM();
-            Plot1Sizedifference_widht = this.Size.Width - panel1.Width;
-            Plot2Sizedifference_widht = this.Size.Width - panel1.Width;
-
-            Plot1Sizedifference_hight = this.Size.Height-panel1.Height;
-            Plot2Sizedifference_hight = this.Size.Height-panel2.Height;
-            Form_Transport_SizeChanged(null, null);
-        }
-        private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
-        {
-            if (checkBox_LockIn.Checked)
-            {
-                string portName = comboBox1.Text;
-                _lock_in_amplifier = new Lock_in_Amplifier_SR830();
-                bool status = _keithley.Connect(portName);
-                if (status)
-                {
-                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
-                }
-                else
-                {
-                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
-                }
-            }
-            else
-            {
-                string portName = comboBox1.Text;
-                _keithley = new Keithley2000();
-                bool status = _keithley.Connect(portName);
-                if (status)
-                {
-                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
-                }
-                else
-                {
-                    button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
-                }
-            }
-           
-        }
-        private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
-        {
-            
-            string portName = comboBox2.Text;            
-            _lakeshore = new LakeShore335();
-            bool status = _lakeshore.Connect(portName);
-            if (status)
-            {
-                button_ConnectToLakeShore.BackColor = System.Drawing.Color.Green;
-            }
-            else
-            {
-                button_ConnectToLakeShore.BackColor = System.Drawing.Color.Orange;
-            }
-        }
-
-        private void button_Menu_Click(object sender, EventArgs e)
-        {
-            GlobalExitHelper.SwitchTo(this, Form_Menu);
-        }
-
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-            _timeStepMs = (int)numericUpDown1.Value;
-        }       
-
-        private async void button3_Click(object sender, EventArgs e)
-        {
-            if (checkBox_LockIn.Checked)
-            {
-                try
-                {
-                    if (!_isRunning)
-                    {
-                        // Запуск
-                        _cts = new CancellationTokenSource();
-                        _isRunning = true;
-                        button3.Text = "Pause";
-                        await Task.Run(() => MeasurementLoopWithLockIn(_cts.Token, check_channel_A.Checked, check_channel_B.Checked, checkBox_Get_K.Checked, checkBox_Get_Sensor.Checked, checkBox_Wtite_time_in_file.Checked));
-                    }
-                    else
-                    {
-                        // Пауза
-                        _cts.Cancel();
-                        _isRunning = false;
-                        button3.Text = "Start";
-                    }
-                }
-                catch (TaskCanceledException)
-                {
-                    // Це нормальне завершення, нічого не робимо
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Помилка в циклі: {ex.Message}");
-                    var x = ex.Message;
-                }
-            }
-            else
-            {
-                try
-                {
-                    if (!_isRunning)
-                    {
-                        // Запуск
-                        _cts = new CancellationTokenSource();
-                        _isRunning = true;
-                        button3.Text = "Pause";
-                        await Task.Run(() => MeasurementLoop(_cts.Token, check_channel_A.Checked, check_channel_B.Checked, checkBox_Get_K.Checked, checkBox_Get_Sensor.Checked, checkBox_Wtite_time_in_file.Checked));
-                    }
-                    else
-                    {
-                        // Пауза
-                        _cts.Cancel();
-                        _isRunning = false;
-                        button3.Text = "Start";
-                    }
-                }
-                catch (TaskCanceledException)
-                {
-                    // Це нормальне завершення, нічого не робимо
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Помилка в циклі: {ex.Message}");
-                    var x = ex.Message;
-                }
-            }
-            
-
-        }
-        private async Task MeasurementLoopWithLockIn(CancellationToken token, bool channel_A, bool channel_B, bool Get_K, bool Get_Sensor, bool read_time = false)
+        private async Task MeasurementLoop(CancellationToken token, bool read_time = false)
         {
             string filePath = label_path.Text;
-            string name_channel = "A";
-            if (channel_B)
-            {
-                name_channel = "B";
-            }
+
             // якщо файл новий – додаємо заголовки
             if (!File.Exists(filePath))
             {
 
             }
+            //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
             File.AppendAllText(filePath, "V\tFrequency\tPhase\r\n");
-            
-            double freq = _lock_in_amplifier.GetFrequency();
-            double phase = _lock_in_amplifier.GetPhase();
-            double ampl = _lock_in_amplifier.GetAmplitude();
+            double freq = _lock_in_Amplifier_SR830.GetFrequency();
+            double phase = _lock_in_Amplifier_SR830.GetPhase();
+            double ampl = _lock_in_Amplifier_SR830.GetAmplitude();
 
             File.AppendAllText(filePath, $"{ampl:E8}\t{freq:E8}\t{phase:E8}\r\n");
-
-            //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
             if (read_time)
             {
-                File.AppendAllText(filePath, "Time\tTemperature\tChanel1\tChanel2\r\n");
+                File.AppendAllText(filePath, "Time\tV\tT\tChanne1\tChannel2\r\n");
             }
             else
             {
-                File.AppendAllText(filePath, "Temperature\tChanel1\tChanel2\r\n");
+                File.AppendAllText(filePath, "V\tT\tChanne1\tChannel2\r\n");
             }
 
 
             var sw = new Stopwatch();
             sw.Start();
             long lastTick = sw.ElapsedTicks;
-            //_keithley.Set_INIT_COUNT_ON();
+            _keithley.Set_INIT_COUNT_ON();
 
             while (!token.IsCancellationRequested)
             {
@@ -316,32 +202,23 @@ namespace Measurement_Kits
                     var time = DateTime.Now.ToString("HH:mm:ss.fff");
 
                     //  зчитування даних з приладів
-                    //double resistance = _keithley.Get_FETCh();
-                    double chanel1 = _lock_in_amplifier.GetDisplayChannel_1();
-                    double chanel2 = _lock_in_amplifier.GetDisplayChannel_2();
-                    double temperature = 0;
-                    if (Get_K)
-                    {
-                        temperature = _lakeshore.GetTemperature_K(name_channel);
+                    double channel1 = _lock_in_Amplifier_SR830.GetDisplayChannel_1();
+                    double v = _keithley.Get_FETCh();
+                    double channel2 = _lock_in_Amplifier_SR830.GetDisplayChannel_2();
+                    double T = ConvertT(v);
 
-                    }
-                    if (Get_Sensor)
-                    {
-                        temperature = _lakeshore.GetSensor(name_channel);
-                    }
 
-                    AddTemperature(temperature);
-                    // Запис у файл
-                    //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
+                    AddTemperature(T);
+
+
                     string line;
                     if (read_time)
                     {
-                        line = $"{time}\t{temperature:E8}\t{chanel1:E8}\t{chanel2:E8}\r\n";
-
+                        line = $"{time}\t{v:E8}\t{T:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
                     }
                     else
                     {
-                        line = $"{temperature:E8}\t{chanel1:E8}\t{chanel2:E8}\r\n";
+                        line = $"{v:E8}\t{T:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
                     }
 
                     File.AppendAllText(filePath, line);
@@ -349,21 +226,25 @@ namespace Measurement_Kits
                     if (measureCounter % 3 == 0) // кожні 3 цикли
                     {
                         double TempSpeed = ComputeTemperatureSlope();
-                        // Оновлюємо label у GUI-потоці
+
                         this.Invoke(new Action(() =>
                         {
-                            label_TempNow.Text = $"P{temperature:f}K";
-                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f3} K/min";
+                            label_TempNow.Text = $"P{T:f4}K";
+                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f4} K/min";
+                            DataLoggerPlot3.Add(measureCounter, TempSpeed);
+                            Plot3.Refresh();
                         }));
 
                     }
                     // Оновлення графіка на формі
                     this.Invoke(new Action(() =>
                     {
-                        DataLoggerPlot1.Add(temperature, chanel1);
-                        DataLoggerPlot2.Add(measureCounter, temperature);
+                        DataLoggerPlot1.Add(T, channel1);
+                        DataLoggerPlot2.Add(measureCounter, T);
+                        
                         Plot1.Refresh();
                         Plot2.Refresh();
+                        
                     }));
                 }
                 else
@@ -383,118 +264,11 @@ namespace Measurement_Kits
             }
 
         }
-        private async Task MeasurementLoop(CancellationToken token, bool channel_A,bool channel_B,bool Get_K,bool Get_Sensor,bool read_time = false)
-        {
-            string filePath = label_path.Text;
-            string name_channel = "A";
-            if (channel_B)
-            {
-                name_channel = "B";
-            }
-            // якщо файл новий – додаємо заголовки
-            if (!File.Exists(filePath))
-            {
-                
-            }
-            //File.AppendAllText(filePath, "Time\tResistance\tTemperature\n");
-            if (read_time)
-            {               
-                File.AppendAllText(filePath, "Time\tTemperature\tResistance\r\n");
-            }
-            else
-            {
-                File.AppendAllText(filePath, "Temperature\tResistance\r\n");
-            }
-            
-
-            var sw = new Stopwatch();
-            sw.Start();
-            long lastTick = sw.ElapsedTicks;
-            _keithley.Set_INIT_COUNT_ON();
-            
-            while (!token.IsCancellationRequested)
-            {
-                // Обчислюємо час, який пройшов
-                long currentTick = sw.ElapsedMilliseconds;
-                double elapsedMicroSec = (long)(currentTick - lastTick);
-
-                if (elapsedMicroSec >= _timeStepMs) // наприклад, 50 мкс
-                {
-                    lastTick += _timeStepMs;
-                    var time = DateTime.Now.ToString("HH:mm:ss.fff");
-
-                    //  зчитування даних з приладів
-                    double resistance = _keithley.Get_FETCh();
-                    double temperature = 0;
-                    if (Get_K) 
-                    {
-                        temperature = _lakeshore.GetTemperature_K(name_channel);
-
-                    }
-                    if (Get_Sensor)
-                    {
-                        temperature = _lakeshore.GetSensor(name_channel);
-                    }
-                    
-                    AddTemperature(temperature);
-                    // Запис у файл
-                    //string line = $"{DateTime.Now:HH:mm:ss.fff}\t{temp:E8}\t{rate:E8}\n";
-                    string line;
-                    if (read_time)
-                    {
-                        line = $"{time}\t{temperature:E8}\t{resistance:E8}\r\n";
-                                  
-                    }
-                    else
-                    {
-                        line = $"{temperature:E8}\t{resistance:E8}\r\n";
-                    }                    
-
-                    File.AppendAllText(filePath, line);                    
-                    measureCounter++;                    
-                    if (measureCounter % 3 == 0) // кожні 3 цикли
-                    {
-                        double TempSpeed = ComputeTemperatureSlope();                        
-                        // Оновлюємо label у GUI-потоці
-                        this.Invoke(new Action(() =>
-                        {
-                            label_TempNow.Text = $"P{temperature:f}K";
-                            label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f3} K/min";
-                        }));
-
-                    }
-                    // Оновлення графіка на формі
-                    this.Invoke(new Action(() =>
-                    {                        
-                        DataLoggerPlot1.Add(temperature, resistance);
-                        DataLoggerPlot2.Add(measureCounter, temperature);
-                        Plot1.Refresh();
-                        Plot2.Refresh();                       
-                    }));
-                }
-                else
-                {
-                    int delay = (int)(_timeStepMs - elapsedMicroSec);
-                    if (delay > 1)
-                    {
-                        await Task.Delay(delay);
-                    }
-                    else
-                    {
-                        await Task.Yield();
-                    }
-                }
-                // Коротка пауза, щоб не “з’їдати” CPU
-                await Task.Yield();
-            }
-
-        }
-       
         private void AddTemperature(double temp)
         {
             var now = DateTime.Now;
             tempHistory.Enqueue((now, temp));
-            if (tempHistory.Count > 5)
+            if (tempHistory.Count > 10)
                 tempHistory.Dequeue();
         }
         public double ComputeTemperatureSlope()
@@ -518,6 +292,37 @@ namespace Measurement_Kits
             double a = (N * sumtT - sumt * sumT) / (N * sumt2 - sumt * sumt);
             return a; // °K/minute
         }
+        private async void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_isRunning)
+                {
+                    // Запуск
+                    _cts = new CancellationTokenSource();
+                    _isRunning = true;
+                    button3.Text = "Pause";
+                    await Task.Run(() => MeasurementLoop(_cts.Token, checkBox_Wtite_time_in_file.Checked));
+                }
+                else
+                {
+                    // Пауза
+                    _cts.Cancel();
+                    _isRunning = false;
+                    button3.Text = "Start";
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // Це нормальне завершення, нічого не робимо
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Помилка в циклі: {ex.Message}");
+                var x = ex.Message;
+            }
+        }
+
         private void label_path_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -532,52 +337,6 @@ namespace Measurement_Kits
                 }
             }
         }
-
-        private void label_path_Click_1(object sender, EventArgs e)
-        {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-                saveFileDialog.DefaultExt = "txt";
-                saveFileDialog.FileName = "data.txt";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    label_path.Text = saveFileDialog.FileName;
-                }
-            }
-        }
-
-        
-
-        
-
-        private void button_Plot1Clear_Click(object sender, EventArgs e)
-        {
-            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
-            Plot1.Plot.Remove(DataLoggerPlot1);
-            DataLoggerPlot1 = Plot1.Plot.Add.DataStreamerXY(10000);
-            DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
-            DataLoggerPlot1.LineWidth = 0;
-            DataLoggerPlot1.MarkerSize = 10;
-            DataLoggerPlot1.MarkerShape = MarkerShape.FilledDiamond;
-            DataLoggerPlot1.ManageAxisLimits = true;
-            Plot1.Refresh();
-        }
-
-        private void button_Plot2Clear_Click(object sender, EventArgs e)
-        {
-            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
-            Plot2.Plot.Remove(DataLoggerPlot2);
-            DataLoggerPlot2 = Plot2.Plot.Add.DataStreamerXY(10000);
-            DataLoggerPlot2.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Blue);
-            DataLoggerPlot2.LineWidth = 0;
-            DataLoggerPlot2.MarkerSize = 10;
-            DataLoggerPlot2.MarkerShape = MarkerShape.FilledDiamond;
-            DataLoggerPlot2.ManageAxisLimits = true;
-            Plot2.Refresh();
-        }
-        
 
         private void button_Plot1Scale_Click(object sender, EventArgs e)
         {
@@ -607,44 +366,148 @@ namespace Measurement_Kits
             }
         }
 
-        private void checkBox_Get_K_CheckedChanged(object sender, EventArgs e)
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            if (checkBox_Get_K.Checked)
-            {
-                checkBox_Get_Sensor.Checked = false;
-            }
-
+            _timeStepMs = (int)numericUpDown1.Value;
         }
 
-        private void checkBox_Get_Sensor_CheckedChanged(object sender, EventArgs e)
+        private void button_Menu_Click(object sender, EventArgs e)
         {
-            if (checkBox_Get_Sensor.Checked)
-            {
-                checkBox_Get_K.Checked = false;
-            }
+            GlobalExitHelper.SwitchTo(this, Form_Menu);
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void button_Plot1Clear_Click(object sender, EventArgs e)
         {
-            if (checkBox_LockIn.Checked)
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot1.Plot.Remove(DataLoggerPlot1);
+            DataLoggerPlot1 = Plot1.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
+            DataLoggerPlot1.LineWidth = 0;
+            DataLoggerPlot1.MarkerSize = 10;
+            DataLoggerPlot1.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot1.ManageAxisLimits = true;
+            Plot1.Refresh();
+        }
+
+        private void button_Plot2Clear_Click(object sender, EventArgs e)
+        {
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot2.Plot.Remove(DataLoggerPlot2);
+            DataLoggerPlot2 = Plot2.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot2.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Blue);
+            DataLoggerPlot2.LineWidth = 0;
+            DataLoggerPlot2.MarkerSize = 10;
+            DataLoggerPlot2.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot2.ManageAxisLimits = true;
+            Plot2.Refresh();
+        }
+
+        private void button_ConnectToMultimetr_Click(object sender, EventArgs e)
+        {
+            string portName = comboBox1.Text;
+            _keithley = new Keithley2000();
+            bool status = _keithley.Connect(portName);
+            if (status)
             {
-                label1.Text = "Lock-in";
+                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
             }
             else
             {
-                label1.Text = "Multimetr";                
+                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Orange;
             }
         }
 
-        private void check_channel_A_CheckedChanged(object sender, EventArgs e)
+        private void button_restartCom_Click(object sender, EventArgs e)
         {
-            if (check_channel_A.Checked)
-                check_channel_B.Checked = false;
+            DisconnectAllDevices();
         }
-        private void check_channel_B_CheckedChanged(object sender, EventArgs e)
+
+        private void button_Plot3Scale_Click(object sender, EventArgs e)
         {
-            if (check_channel_B.Checked)
-                check_channel_A.Checked = false;
+            DataLoggerPlot3.ManageAxisLimits = !DataLoggerPlot3.ManageAxisLimits;
+            Plot3.Refresh();
+            if (DataLoggerPlot3.ManageAxisLimits)
+            {
+                button_Plot3Scale.Text = "AutoS";
+            }
+            else
+            {
+                button_Plot3Scale.Text = "No AutoS";
+            }
+        }
+
+        private void button_Plot3Clear_Click(object sender, EventArgs e)
+        {
+            // DataStreamerXY does not have a Clear() method. To clear the plot, remove and re-add the DataStreamerXY.
+            Plot3.Plot.Remove(DataLoggerPlot3);
+            DataLoggerPlot3 = Plot3.Plot.Add.DataStreamerXY(10000);
+            DataLoggerPlot3.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
+            DataLoggerPlot3.LineWidth = 0;
+            DataLoggerPlot3.MarkerSize = 5;
+            DataLoggerPlot3.MarkerShape = MarkerShape.FilledDiamond;
+            DataLoggerPlot3.ManageAxisLimits = true;
+            Plot3.Refresh();
+        }
+
+        private void button_ConnectToLakeShore_Click(object sender, EventArgs e)
+        {
+            string portName = comboBox2.Text;
+            _lock_in_Amplifier_SR830 = new Lock_in_Amplifier_SR830();
+            bool status = _lock_in_Amplifier_SR830.Connect(portName);
+            if (status)
+            {
+                button_ConnectToLock_In_Ampl.BackColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                button_ConnectToLock_In_Ampl.BackColor = System.Drawing.Color.Orange;
+            }
+        }
+        private void DisconnectAllDevices()
+        {
+            try
+            {
+                // 1. Зупиняємо вимірювання, якщо вони запущені
+                if (_isRunning)
+                {
+                    _cts?.Cancel();
+                    _isRunning = false;
+                    button3.Text = "Start";
+                }
+
+                // 2. Відключаємо мультиметр
+                if (_keithley != null)
+                {
+                    _keithley.Disconnect();
+                    _keithley = null;
+                }
+
+                // 3. Відключаємо Lock-in amplifier
+                if (_lock_in_Amplifier_SR830 != null)
+                {
+                    _lock_in_Amplifier_SR830.Disconnect();
+                    _lock_in_Amplifier_SR830 = null;
+                }
+
+                // 4. Очищаємо список COM-портів
+                comboBox1.Items.Clear();
+                comboBox2.Items.Clear();
+
+                // 5. Оновлюємо список доступних COM-портів
+                CreatCOM();
+
+                // 6. Встановлюємо колір кнопок
+                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Red;
+                button_ConnectToLock_In_Ampl.BackColor = System.Drawing.Color.Red;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Помилка при відключенні приладів:\n{ex.Message}",
+                    "Disconnect error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
 

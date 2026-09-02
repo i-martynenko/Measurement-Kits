@@ -636,6 +636,61 @@ namespace Measurement_Kits
             }
         }
 
+        private void button_restartCom_Click(object sender, EventArgs e)
+        {
+            DisconnectAllDevices();
+        }
+        private void DisconnectAllDevices()
+        {
+            try
+            {
+                // 1. Зупиняємо вимірювання, якщо вони запущені
+                if (_isRunning)
+                {
+                    _cts?.Cancel();
+                    _isRunning = false;
+                    button3.Text = "Start";
+                }
+
+                // 2. Відключаємо мультиметр
+                if (_keithley != null)
+                {
+                    _keithley.Disconnect();
+                    _keithley = null;
+                }
+
+                // 3. Відключаємо Lock-in amplifier
+                if (_lock_in_amplifier != null)
+                {
+                    _lock_in_amplifier.Disconnect();
+                    _lock_in_amplifier = null;
+                }
+                if (_lakeshore != null)
+                {
+                    _lakeshore.Disconnect();
+                    _lakeshore = null;
+                }
+
+                // 4. Очищаємо список COM-портів
+                comboBox1.Items.Clear();
+                comboBox2.Items.Clear();
+
+                // 5. Оновлюємо список доступних COM-портів
+                CreatCOM();
+
+                // 6. Встановлюємо колір кнопок
+                button_ConnectToMultimetr.BackColor = System.Drawing.Color.Red;
+                button_ConnectToLakeShore.BackColor = System.Drawing.Color.Red;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Помилка при відключенні приладів:\n{ex.Message}",
+                    "Disconnect error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
         private void check_channel_A_CheckedChanged(object sender, EventArgs e)
         {
             if (check_channel_A.Checked)

@@ -40,6 +40,7 @@ namespace Measurement_Kits
             this.label_Plot2_Coordinate = new System.Windows.Forms.Label();
             this.button_Plot2Scale = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.checkBox_LockIn = new System.Windows.Forms.CheckBox();
             this.checkBox_Wtite_time_in_file = new System.Windows.Forms.CheckBox();
             this.checkBox_Get_Sensor = new System.Windows.Forms.CheckBox();
             this.checkBox_Get_K = new System.Windows.Forms.CheckBox();
@@ -58,7 +59,7 @@ namespace Measurement_Kits
             this.label1 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.checkBox_LockIn = new System.Windows.Forms.CheckBox();
+            this.button_restartCom = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -166,6 +167,7 @@ namespace Measurement_Kits
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel3.Controls.Add(this.button_restartCom);
             this.panel3.Controls.Add(this.checkBox_LockIn);
             this.panel3.Controls.Add(this.checkBox_Wtite_time_in_file);
             this.panel3.Controls.Add(this.checkBox_Get_Sensor);
@@ -188,6 +190,17 @@ namespace Measurement_Kits
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(238, 744);
             this.panel3.TabIndex = 3;
+            // 
+            // checkBox_LockIn
+            // 
+            this.checkBox_LockIn.AutoSize = true;
+            this.checkBox_LockIn.Location = new System.Drawing.Point(16, 176);
+            this.checkBox_LockIn.Name = "checkBox_LockIn";
+            this.checkBox_LockIn.Size = new System.Drawing.Size(62, 17);
+            this.checkBox_LockIn.TabIndex = 18;
+            this.checkBox_LockIn.Text = "Lock-In";
+            this.checkBox_LockIn.UseVisualStyleBackColor = true;
+            this.checkBox_LockIn.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // checkBox_Wtite_time_in_file
             // 
@@ -362,16 +375,15 @@ namespace Measurement_Kits
             this.label1.TabIndex = 1;
             this.label1.Text = "Multimetr";
             // 
-            // checkBox_LockIn
+            // button_restartCom
             // 
-            this.checkBox_LockIn.AutoSize = true;
-            this.checkBox_LockIn.Location = new System.Drawing.Point(16, 176);
-            this.checkBox_LockIn.Name = "checkBox_LockIn";
-            this.checkBox_LockIn.Size = new System.Drawing.Size(62, 17);
-            this.checkBox_LockIn.TabIndex = 18;
-            this.checkBox_LockIn.Text = "Lock-In";
-            this.checkBox_LockIn.UseVisualStyleBackColor = true;
-            this.checkBox_LockIn.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.button_restartCom.Location = new System.Drawing.Point(129, 134);
+            this.button_restartCom.Name = "button_restartCom";
+            this.button_restartCom.Size = new System.Drawing.Size(100, 23);
+            this.button_restartCom.TabIndex = 19;
+            this.button_restartCom.Text = "Restart COM";
+            this.button_restartCom.UseVisualStyleBackColor = true;
+            this.button_restartCom.Click += new System.EventHandler(this.button_restartCom_Click);
             // 
             // Form_Transport
             // 
@@ -427,5 +439,6 @@ namespace Measurement_Kits
         private System.Windows.Forms.Button button_Plot1Clear;
         private System.Windows.Forms.Button button_Plot2Clear;
         private System.Windows.Forms.CheckBox checkBox_LockIn;
+        private System.Windows.Forms.Button button_restartCom;
     }
 }
