@@ -101,9 +101,10 @@ namespace Measurement_Kits
             DataLoggerPlot3 = Plot3.Plot.Add.DataStreamerXY(10000);
             Plot3.Plot.XLabel("Index");
             Plot3.Plot.YLabel("Speed K");
+            Plot3.Plot.Axes.Bottom.Label.FontSize = 5;
+            Plot3.Plot.Axes.Left.Label.FontSize = 5;
 
-
-            DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
+			DataLoggerPlot1.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
             DataLoggerPlot2.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Blue);
             DataLoggerPlot3.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Purple);
 

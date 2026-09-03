@@ -150,7 +150,7 @@ namespace Measurement_Kits
             {
                 string portName = comboBox1.Text;
                 _lock_in_amplifier = new Lock_in_Amplifier_SR830();
-                bool status = _keithley.Connect(portName);
+                bool status = _lock_in_amplifier.Connect(portName);
                 if (status)
                 {
                     button_ConnectToMultimetr.BackColor = System.Drawing.Color.Green;
