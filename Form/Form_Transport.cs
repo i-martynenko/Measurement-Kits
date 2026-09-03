@@ -636,7 +636,12 @@ namespace Measurement_Kits
             }
         }
 
-        private void check_channel_A_CheckedChanged(object sender, EventArgs e)
+		private void panel1_Paint(object sender, PaintEventArgs e)
+		{
+
+		}
+
+		private void check_channel_A_CheckedChanged(object sender, EventArgs e)
         {
             if (check_channel_A.Checked)
                 check_channel_B.Checked = false;
