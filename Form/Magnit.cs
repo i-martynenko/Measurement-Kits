@@ -180,23 +180,40 @@ namespace Measurement_Kits
 					_isRunning = true;
 					button3.Text = "Pause";
 					button_Reset.Text = $"Reset {_isRunning}";
-					if (checkBox_Hysteresis.Checked)
+					if (checkBox_Set_Lock_Magnet.Checked) 
 					{
-						await Task.Run(() => MeasurementLoopHysteresis(_cts.Token,
-						Convert.ToDouble(textBox_Mag_Start.Text),
-						Convert.ToDouble(textBox_Mag_Delta.Text),
-						Convert.ToDouble(textBox_Mag_End.Text),
-						checkBox_Wtite_time_in_file.Checked));
+						await Task.Run(() => MeasureLoop_WithSetLockIn(_cts.Token,
+									Convert.ToDouble(textBox_Mag_Start.Text),
+									Convert.ToDouble(textBox_Mag_Delta.Text),
+									Convert.ToDouble(textBox_Mag_End.Text),
+									checkBox_Wtite_time_in_file.Checked));
 					}
 					else
 					{
-						await Task.Run(() => MeasurementLoop(_cts.Token,
-						Convert.ToDouble(textBox_Mag_Start.Text),
-						Convert.ToDouble(textBox_Mag_Delta.Text),
-						Convert.ToDouble(textBox_Mag_End.Text),
-						checkBox_Wtite_time_in_file.Checked));
+						if (checkBox_Hysteresis.Checked)
+						{
+							await Task.Run(() => MeasurementLoopHysteresis(_cts.Token,
+									Convert.ToDouble(textBox_Mag_Start.Text),
+									Convert.ToDouble(textBox_Mag_Delta.Text),
+									Convert.ToDouble(textBox_Mag_End.Text),
+									checkBox_Wtite_time_in_file.Checked));
+
+
+
+
+						}
+						else
+						{
+							await Task.Run(() => MeasurementLoop(_cts.Token,
+										Convert.ToDouble(textBox_Mag_Start.Text),
+										Convert.ToDouble(textBox_Mag_Delta.Text),
+										Convert.ToDouble(textBox_Mag_End.Text),
+										checkBox_Wtite_time_in_file.Checked));
+
+						}
 					}
 					
+
 				}
 				else
 				{
@@ -408,6 +425,109 @@ namespace Measurement_Kits
 			}
 
 			_magnet.SetMagneticField(0);
+		}
+		
+		private async Task MeasureLoop_WithSetLockIn(CancellationToken token, double freq_start, double points, double freq_end, bool read_time = false)
+		{
+			string filePath = label_path.Text;
+			if (read_time)
+			{
+				File.AppendAllText(filePath,
+					"Time\tFreq\tChannel1\tChannel2\r\n");
+			}
+			else
+			{
+				File.AppendAllText(filePath,
+					"Freq\tChannel1\tChannel2\r\n");
+			}
+			
+
+
+			var sw = new Stopwatch();
+			sw.Start();
+			long lastTick = sw.ElapsedTicks;
+
+			
+			if (freq_start <=0 ) { freq_start = 1; }
+			double freq_now = freq_start;
+			_lock_in_amplifier.SetFrequency(freq_now);
+
+			double k = Math.Pow(freq_end/freq_start,1.0/(points-1)); 
+			while (!token.IsCancellationRequested)
+			{
+				if (freq_now > freq_end) { 
+					break;
+				}
+				// Обчислюємо час, який пройшов
+				long currentTick = sw.ElapsedMilliseconds;
+				double elapsedMicroSec = (long)(currentTick - lastTick);
+
+
+
+				if (elapsedMicroSec >= _timeStepMs) // наприклад, 50 мкс
+				{
+					lastTick += _timeStepMs;
+					var time = DateTime.Now.ToString("HH:mm:ss.fff");
+					string line;
+					double channel1 = 0;
+					double channel2 = 0;
+					
+					channel1 = _lock_in_amplifier.GetDisplayChannel_1();
+
+					channel2 = _lock_in_amplifier.GetDisplayChannel_2();
+					if (read_time)
+					{
+						line =
+							$"{time}\t{freq_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+					}
+					else
+					{
+						line =
+							$"{freq_now:E8}\t{channel1:E8}\t{channel2:E8}\r\n";
+					}
+					freq_now *= k;
+					_lock_in_amplifier.SetFrequency(freq_now);
+
+
+					File.AppendAllText(filePath, line);
+					measureCounter++;
+					if (measureCounter % 3 == 0) // кожні 3 цикли
+					{
+						double TempSpeed = ComputeTemperatureSlope();
+						// Оновлюємо label у GUI-потоці
+						this.Invoke(new Action(() =>
+						{
+							label_TempNow.Text = $"P{freq_now:f}K";
+							label_TempSpeed.Text = $"Temp Speed = {TempSpeed:f3} K/min";
+						}));
+
+					}
+					// Оновлення графіка на формі
+					this.Invoke(new Action(() =>
+					{
+						DataLoggerPlot1.Add(freq_now, channel1);
+						DataLoggerPlot2.Add(freq_now, channel2);
+						Plot1.Refresh();
+						Plot2.Refresh();
+					}));
+				}
+				else
+				{
+					int delay = (int)(_timeStepMs - elapsedMicroSec);
+					if (delay > 1)
+					{
+						await Task.Delay(delay);
+					}
+					else
+					{
+						await Task.Yield();
+					}
+				}
+				
+				// Коротка пауза, щоб не “з’їдати” CPU
+				await Task.Yield();
+			}
+
 		}
 		private async Task MeasurementLoop(CancellationToken token, double magnet_start, double magnet_delta, double magnet_end, bool read_time = false)
 		{
@@ -656,7 +776,12 @@ namespace Measurement_Kits
             }
         }
 
-        public double ComputeTemperatureSlope()
+		private void button_SetFreq_Click(object sender, EventArgs e)
+		{
+			_lock_in_amplifier.SetFrequency(Convert.ToDouble(textBox_SetFreq.Text));
+		}
+
+		public double ComputeTemperatureSlope()
 		{
 			if (tempHistory.Count < 2)
 				return 0;
@@ -689,6 +814,7 @@ namespace Measurement_Kits
 			Plot1Sizedifference_hight = this.Size.Height - panel1.Height;
 			Plot2Sizedifference_hight = this.Size.Height - panel2.Height;
 			Magnit_SizeChanged(null, null);
+			checkBox_Lock_in_Multimeter_CheckedChanged(null, null);
 
 		}
 	}

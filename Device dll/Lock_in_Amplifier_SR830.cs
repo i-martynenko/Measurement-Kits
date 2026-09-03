@@ -52,8 +52,12 @@ namespace Measurement_Kits
             string resp = SendCommand("OUTR? 2", waitMs);
             return resp != null ? (double)ParseResponse(resp) : double.NaN;
         }
+        public void SetFrequency(double frequency, int waitMs = 45)
+		{
+			SendCommand($"FREQ {frequency}", waitMs);
+		}
 
-        
 
-    }
+
+	}
 }
