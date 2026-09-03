@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace Measurement_Kits
@@ -448,10 +449,48 @@ namespace Measurement_Kits
             }
         }
 
-       
+        private void button_restartCom_Click(object sender, EventArgs e)
+        {
+            DisconnectAllDevices();
+        }
+        private void DisconnectAllDevices()
+        {
+            try
+            {
+                // 1. Зупиняємо вимірювання, якщо вони запущені
+                if (_isRunning)
+                {
+                    _cts?.Cancel();
+                    _isRunning = false;
+                    button3.Text = "Start";
+                }
 
-       
+                // 3. Відключаємо Lock-in amplifier
+                if (_lakeshore != null)
+                {
+                    _lakeshore.Disconnect();
+                    _lakeshore = null;
+                }
+                // 4. Очищаємо список COM-портів
+                
+                comboBox2.Items.Clear();
 
+                // 5. Оновлюємо список доступних COM-портів
+                CreatCOM();
+
+                // 6. Встановлюємо колір кнопок
+                button_ConnectToLakeShore.BackColor = System.Drawing.Color.Red;
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Помилка при відключенні приладів:\n{ex.Message}",
+                    "Disconnect error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
         private void check_channel_A_CheckedChanged(object sender, EventArgs e)
         {
             if (check_channel_A.Checked)
