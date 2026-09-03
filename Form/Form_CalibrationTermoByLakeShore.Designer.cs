@@ -53,6 +53,7 @@ namespace Measurement_Kits
             this.button_ConnectToLakeShore = new System.Windows.Forms.Button();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.button_restartCom = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -160,6 +161,7 @@ namespace Measurement_Kits
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel3.Controls.Add(this.button_restartCom);
             this.panel3.Controls.Add(this.checkBox_Wtite_time_in_file);
             this.panel3.Controls.Add(this.check_channel_B);
             this.panel3.Controls.Add(this.check_channel_A);
@@ -301,6 +303,16 @@ namespace Measurement_Kits
             this.button_ConnectToLakeShore.UseVisualStyleBackColor = false;
             this.button_ConnectToLakeShore.Click += new System.EventHandler(this.button_ConnectToLakeShore_Click);
             // 
+            // button_restartCom
+            // 
+            this.button_restartCom.Location = new System.Drawing.Point(138, 138);
+            this.button_restartCom.Name = "button_restartCom";
+            this.button_restartCom.Size = new System.Drawing.Size(100, 23);
+            this.button_restartCom.TabIndex = 18;
+            this.button_restartCom.Text = "Restart COM";
+            this.button_restartCom.UseVisualStyleBackColor = true;
+            this.button_restartCom.Click += new System.EventHandler(this.button_restartCom_Click);
+            // 
             // Form_CalibrationTermoByLakeShore
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -310,7 +322,7 @@ namespace Measurement_Kits
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Name = "Form_CalibrationTermoByLakeShore";
-            this.Text = "Transport";
+            this.Text = "Form_CalibrationTermoByLakeShore";
             this.Load += new System.EventHandler(this.CalibrationTermoByLakeShore_Load);
             this.SizeChanged += new System.EventHandler(this.Form_CalibrationTermoByLakeShore_SizeChanged);
             this.panel1.ResumeLayout(false);
@@ -349,5 +361,6 @@ namespace Measurement_Kits
         private System.Windows.Forms.CheckBox check_channel_A;
         private System.Windows.Forms.Button button_Plot1Clear;
         private System.Windows.Forms.Button button_Plot2Clear;
+        private System.Windows.Forms.Button button_restartCom;
     }
 }
